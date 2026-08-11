@@ -115,10 +115,13 @@ if [ "$RUN_MODE" = "smoke" ]; then
   export SFT_EPOCHS=${SFT_EPOCHS:-0.1}
   export GRPO_STEPS=${GRPO_STEPS:-20}
   export EVAL_TASKS=${EVAL_TASKS:-48}
+  export ARTIFACT_ROOT=${ARTIFACT_ROOT:-artifacts/smoke}
 elif [ "$RUN_MODE" != "full" ]; then
   echo "RUN_MODE must be 'smoke' or 'full'." >&2
   exit 2
+else
+  export ARTIFACT_ROOT=${ARTIFACT_ROOT:-artifacts}
 fi
 
 mkdir -p outputs
-exec bash server/run_all.sh 2>&1 | tee outputs/run_all.log
+exec bash server/run_all.sh 2>&1 | tee outputs/run_all.log "outputs/run_all_${RUN_MODE}.log"

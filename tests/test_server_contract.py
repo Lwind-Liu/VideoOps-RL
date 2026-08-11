@@ -20,6 +20,7 @@ def test_bootstrap_and_dependency_contract_is_pinned():
     assert "vllm==0.25.1" in requirements
     assert "deepspeed==0.19.5" in bootstrap
     assert 'RUN_MODE=${RUN_MODE:-full}' in bootstrap
+    assert 'ARTIFACT_ROOT=${ARTIFACT_ROOT:-artifacts/smoke}' in bootstrap
     assert 'cp -a "$PATH_TO_OVERLAY" "$PROJECT_DIR/"' in bootstrap
     assert 'bootstrap.log' in bootstrap
     assert "RUN_MODE=smoke bash bootstrap_server.sh" in readme

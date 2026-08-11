@@ -52,10 +52,10 @@ Smoke 的 Go 条件：
 
 - `server/preflight.py` 输出中的 `passed` 为 `true`；
 - SFT 能产生 loss，且没有 OOM/NaN；
-- `artifacts/sft_qwen3vl2b/` 和 `artifacts/sft_qwen3vl2b_merged/` 已生成；
+- `artifacts/smoke/sft_qwen3vl2b/` 和 `artifacts/smoke/sft_qwen3vl2b_merged/` 已生成；
 - vLLM health check 通过；
 - GRPO completion 中出现合法工具调用，组内 reward 不是恒定值；
-- `artifacts/grpo_qwen3vl2b/` 已生成；
+- `artifacts/smoke/grpo_qwen3vl2b/` 已生成；
 - val/test 评测报告已生成；
 - `outputs/run_all.log` 最后没有 traceback、OOM 或子进程失败。
 
@@ -68,7 +68,7 @@ cd /root/code
 RUN_MODE=full bash bootstrap_server.sh
 ```
 
-启动器支持重复执行：已经通过校验的下载分片不会重新下载，代码会使用 Git 仓库中的最新版本覆盖离线包内的旧代码快照。
+启动器支持重复执行：已经通过校验的下载分片不会重新下载，代码会使用 Git 仓库中的最新版本覆盖离线包内的旧代码快照。Smoke checkpoint 保存在 `artifacts/smoke/`，不会污染 Full 的正式输出。
 
 如果服务器不能访问 GitHub Release，请先将三个 Release 分片转存到同一个内部 HTTP 目录，然后执行：
 
@@ -161,10 +161,14 @@ VideoOps-RL 运行结果
 
 ## 主要输出目录
 
+以下训练路径都相对于实际运行目录 `.videoops-bootstrap/runtime/VideoOps-RL/`；启动阶段日志位于 Git checkout 的 `.videoops-bootstrap/bootstrap.log`。
+
+- `artifacts/smoke/`：Smoke 专用 checkpoint，与 Full 隔离；
 - `artifacts/sft_qwen3vl2b/`：SFT LoRA adapter；
 - `artifacts/sft_qwen3vl2b_merged/`：合并后的完整 SFT 模型，供 vLLM 和 GRPO 使用；
 - `artifacts/grpo_qwen3vl2b/`：GRPO checkpoint；
 - `outputs/run_all.log`：一键链路总日志；
+- `outputs/run_all_smoke.log`、`outputs/run_all_full.log`：分别保留 Smoke 和 Full 总日志；
 - `.videoops-bootstrap/bootstrap.log`：从主机门禁、下载到依赖安装的完整启动日志；
 - `outputs/vllm.log`：rollout 服务日志；
 - `outputs/reports/checkpoint_all_val_eval.json`：验证集评测；
