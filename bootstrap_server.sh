@@ -15,10 +15,29 @@ mkdir -p "$WORK_DIR/downloads" "$WORK_DIR/runtime"
 
 for PART in 00 01 02; do
   FILE="${PACKAGE_NAME}.part-${PART}"
-  if [ ! -f "$WORK_DIR/downloads/$FILE" ]; then
+  EXPECTED_SHA=$(awk -v file="$FILE" '$2 == file { print $1 }' release_manifest.sha256)
+  if [ -z "$EXPECTED_SHA" ]; then
+    echo "Missing checksum for $FILE" >&2
+    exit 3
+  fi
+
+  if [ ! -f "$WORK_DIR/downloads/$FILE" ] || \
+     ! echo "$EXPECTED_SHA  $WORK_DIR/downloads/$FILE" | sha256sum --check --status; then
     echo "Downloading $FILE ..."
-    curl --fail --location --retry 8 --retry-all-errors \
-      --continue-at - --output "$WORK_DIR/downloads/$FILE" "$BASE_URL/$FILE"
+    if ! curl --fail --location --retry 8 --retry-all-errors \
+      --continue-at - --output "$WORK_DIR/downloads/$FILE" "$BASE_URL/$FILE"; then
+      echo "Resume failed for $FILE; retrying from byte zero ..."
+      rm -f "$WORK_DIR/downloads/$FILE"
+      curl --fail --location --retry 8 --retry-all-errors \
+        --output "$WORK_DIR/downloads/$FILE" "$BASE_URL/$FILE"
+    fi
+
+    if ! echo "$EXPECTED_SHA  $WORK_DIR/downloads/$FILE" | sha256sum --check --status; then
+      echo "Checksum mismatch for $FILE; retrying a clean download ..."
+      rm -f "$WORK_DIR/downloads/$FILE"
+      curl --fail --location --retry 8 --retry-all-errors \
+        --output "$WORK_DIR/downloads/$FILE" "$BASE_URL/$FILE"
+    fi
   fi
 done
 
