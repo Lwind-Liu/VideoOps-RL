@@ -14,8 +14,17 @@ def test_grpo_generation_groups_fit_both_distributed_paths():
 def test_bootstrap_and_dependency_contract_is_pinned():
     requirements = (ROOT / "server/requirements-llm-grpo.txt").read_text(encoding="utf-8")
     bootstrap = (ROOT / "bootstrap_server.sh").read_text(encoding="utf-8")
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    collector = (ROOT / "server/collect_run_bundle.sh").read_text(encoding="utf-8")
     assert "trl[vllm,peft,vlm]==1.9.2" in requirements
     assert "vllm==0.25.1" in requirements
     assert "deepspeed==0.19.5" in bootstrap
     assert 'RUN_MODE=${RUN_MODE:-full}' in bootstrap
     assert 'cp -a "$PATH_TO_OVERLAY" "$PROJECT_DIR/"' in bootstrap
+    assert 'bootstrap.log' in bootstrap
+    assert "RUN_MODE=smoke bash bootstrap_server.sh" in readme
+    assert "RUN_MODE=full bash bootstrap_server.sh" in readme
+    assert "跑完后必须回传什么" in readme
+    assert "checkpoint_all_val_eval.json" in readme
+    assert "checkpoint_all_test_eval.json" in readme
+    assert "checkpoint_sha256.txt" in collector

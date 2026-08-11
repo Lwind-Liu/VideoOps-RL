@@ -11,6 +11,9 @@ PACKAGE_NAME=VideoOps-RL-offline-server.zip
 PACKAGE_SHA256=cdd99e1467be9f0de4f311afd6dafe522c3a0b16cc8485b741ab622d1ecd4fe1
 BASE_URL=${VIDEOOPS_BASE_URL:-"https://github.com/${REPOSITORY}/releases/download/${RELEASE_TAG}"}
 
+mkdir -p "$WORK_DIR"
+exec > >(tee -a "$WORK_DIR/bootstrap.log") 2>&1
+
 for REQUIRED_COMMAND in python curl sha256sum; do
   command -v "$REQUIRED_COMMAND" >/dev/null || {
     echo "Missing required command: $REQUIRED_COMMAND" >&2
