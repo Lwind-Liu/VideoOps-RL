@@ -13,14 +13,10 @@
 
 ```bash
 cd /root/code
-RUN_MODE=smoke bash bootstrap_server.sh
+bash bootstrap_server.sh
 ```
 
-Smoke 通过后：
-
-```bash
-RUN_MODE=full bash bootstrap_server.sh
-```
+该命令会自动先运行 Smoke，成功后继续 Full，不需要执行者手动拆分阶段。
 
 启动脚本首先检查 Python 3.11/3.12、CUDA PyTorch、至少 8 张可见 GPU、20 GiB 可用磁盘，以及 `curl`/`sha256sum`。门禁不通过时不会开始下载大文件。依赖版本已锁定，其中 TRL 1.9.2 对应 vLLM 0.25.1；DeepSpeed 在确认镜像已有 CUDA PyTorch 后以非隔离方式安装。
 
@@ -37,5 +33,5 @@ PREPARE_ONLY=1 bash bootstrap_server.sh
 若镜像已经安装全部 Python 依赖，可跳过 pip：
 
 ```bash
-INSTALL_DEPS=0 RUN_MODE=full bash bootstrap_server.sh
+INSTALL_DEPS=0 bash bootstrap_server.sh
 ```

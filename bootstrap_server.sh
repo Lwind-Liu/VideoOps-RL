@@ -3,7 +3,7 @@ set -euo pipefail
 
 REPOSITORY=${VIDEOOPS_REPOSITORY:-Lwind-Liu/VideoOps-RL}
 RELEASE_TAG=${VIDEOOPS_RELEASE_TAG:-offline-v2.0.0}
-RUN_MODE=${RUN_MODE:-full}
+RUN_MODE=${RUN_MODE:-auto}
 INSTALL_DEPS=${INSTALL_DEPS:-1}
 PREPARE_ONLY=${PREPARE_ONLY:-0}
 WORK_DIR=${VIDEOOPS_WORK_DIR:-$PWD/.videoops-bootstrap}
@@ -111,17 +111,42 @@ if [ "$PREPARE_ONLY" = "1" ]; then
   exit 0
 fi
 
-if [ "$RUN_MODE" = "smoke" ]; then
-  export SFT_EPOCHS=${SFT_EPOCHS:-0.1}
-  export GRPO_STEPS=${GRPO_STEPS:-20}
-  export EVAL_TASKS=${EVAL_TASKS:-48}
-  export ARTIFACT_ROOT=${ARTIFACT_ROOT:-artifacts/smoke}
-elif [ "$RUN_MODE" != "full" ]; then
-  echo "RUN_MODE must be 'smoke' or 'full'." >&2
-  exit 2
-else
-  export ARTIFACT_ROOT=${ARTIFACT_ROOT:-artifacts}
-fi
-
 mkdir -p outputs
-exec bash server/run_all.sh 2>&1 | tee outputs/run_all.log "outputs/run_all_${RUN_MODE}.log"
+
+run_pipeline() {
+  local MODE=$1
+  local MODE_SFT_EPOCHS MODE_GRPO_STEPS MODE_EVAL_TASKS MODE_ARTIFACT_ROOT
+  if [ "$MODE" = "smoke" ]; then
+    MODE_SFT_EPOCHS=${SMOKE_SFT_EPOCHS:-${SFT_EPOCHS:-0.1}}
+    MODE_GRPO_STEPS=${SMOKE_GRPO_STEPS:-${GRPO_STEPS:-20}}
+    MODE_EVAL_TASKS=${SMOKE_EVAL_TASKS:-${EVAL_TASKS:-48}}
+    MODE_ARTIFACT_ROOT=${SMOKE_ARTIFACT_ROOT:-artifacts/smoke}
+  else
+    MODE_SFT_EPOCHS=${FULL_SFT_EPOCHS:-${SFT_EPOCHS:-3.0}}
+    MODE_GRPO_STEPS=${FULL_GRPO_STEPS:-${GRPO_STEPS:-200}}
+    MODE_EVAL_TASKS=${FULL_EVAL_TASKS:-${EVAL_TASKS:-300}}
+    MODE_ARTIFACT_ROOT=${FULL_ARTIFACT_ROOT:-artifacts}
+  fi
+  echo "Starting ${MODE} pipeline."
+  RUN_MODE="$MODE" \
+  SFT_EPOCHS="$MODE_SFT_EPOCHS" \
+  GRPO_STEPS="$MODE_GRPO_STEPS" \
+  EVAL_TASKS="$MODE_EVAL_TASKS" \
+  ARTIFACT_ROOT="$MODE_ARTIFACT_ROOT" \
+    bash server/run_all.sh 2>&1 | tee outputs/run_all.log "outputs/run_all_${MODE}.log"
+}
+
+case "$RUN_MODE" in
+  auto)
+    run_pipeline smoke
+    echo "Smoke passed; continuing to full training automatically."
+    run_pipeline full
+    ;;
+  smoke|full)
+    run_pipeline "$RUN_MODE"
+    ;;
+  *)
+    echo "RUN_MODE must be 'auto', 'smoke', or 'full'." >&2
+    exit 2
+    ;;
+esac

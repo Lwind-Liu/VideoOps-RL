@@ -19,13 +19,12 @@ def test_bootstrap_and_dependency_contract_is_pinned():
     assert "trl[vllm,peft,vlm]==1.9.2" in requirements
     assert "vllm==0.25.1" in requirements
     assert "deepspeed==0.19.5" in bootstrap
-    assert 'RUN_MODE=${RUN_MODE:-full}' in bootstrap
-    assert 'ARTIFACT_ROOT=${ARTIFACT_ROOT:-artifacts/smoke}' in bootstrap
+    assert 'RUN_MODE=${RUN_MODE:-auto}' in bootstrap
+    assert 'run_pipeline smoke' in bootstrap
+    assert 'run_pipeline full' in bootstrap
     assert 'cp -a "$PATH_TO_OVERLAY" "$PROJECT_DIR/"' in bootstrap
     assert 'bootstrap.log' in bootstrap
-    assert "RUN_MODE=smoke bash bootstrap_server.sh" in readme
-    assert "RUN_MODE=full bash bootstrap_server.sh" in readme
-    assert "跑完后必须回传什么" in readme
-    assert "checkpoint_all_val_eval.json" in readme
-    assert "checkpoint_all_test_eval.json" in readme
+    assert "cd /root/code && bash bootstrap_server.sh" in readme
+    assert "下面两种情况二选一，不要依次执行" in readme
+    assert "结束后打包回传" in readme
     assert "checkpoint_sha256.txt" in collector
