@@ -11,6 +11,32 @@ PACKAGE_NAME=VideoOps-RL-offline-server.zip
 PACKAGE_SHA256=cdd99e1467be9f0de4f311afd6dafe522c3a0b16cc8485b741ab622d1ecd4fe1
 BASE_URL=${VIDEOOPS_BASE_URL:-"https://github.com/${REPOSITORY}/releases/download/${RELEASE_TAG}"}
 
+for REQUIRED_COMMAND in python curl sha256sum; do
+  command -v "$REQUIRED_COMMAND" >/dev/null || {
+    echo "Missing required command: $REQUIRED_COMMAND" >&2
+    exit 2
+  }
+done
+
+python - <<'PY'
+import shutil
+import sys
+
+if not ((3, 11) <= sys.version_info[:2] < (3, 13)):
+    raise SystemExit(f"Python 3.11 or 3.12 is required; found {sys.version.split()[0]}")
+try:
+    import torch
+except ImportError as error:
+    raise SystemExit("The selected image must provide CUDA PyTorch before bootstrap.") from error
+gpu_count = torch.cuda.device_count()
+if not torch.cuda.is_available() or gpu_count < 8:
+    raise SystemExit(f"At least 8 CUDA GPUs are required; detected {gpu_count}.")
+free_gib = shutil.disk_usage(".").free / 1024**3
+if free_gib < 20:
+    raise SystemExit(f"At least 20 GiB free disk is required; found {free_gib:.2f} GiB.")
+print(f"Host gate passed: Python {sys.version.split()[0]}, {gpu_count} GPUs, {free_gib:.2f} GiB free.")
+PY
+
 mkdir -p "$WORK_DIR/downloads" "$WORK_DIR/runtime"
 
 for PART in 00 01 02; do
@@ -58,11 +84,23 @@ if [ ! -f "$WORK_DIR/runtime/VideoOps-RL/PACKAGE_MANIFEST.json" ]; then
 fi
 
 PROJECT_DIR="$WORK_DIR/runtime/VideoOps-RL"
+
+# The Release owns large immutable assets. The small Git checkout owns the
+# current executable code, so fixes do not require republishing 5.5 GiB.
+for PATH_TO_OVERLAY in configs schemas scripts server src tests pyproject.toml README.md; do
+  if [ -e "$PATH_TO_OVERLAY" ]; then
+    cp -a "$PATH_TO_OVERLAY" "$PROJECT_DIR/"
+  fi
+done
+
 cd "$PROJECT_DIR"
 
 if [ "$INSTALL_DEPS" = "1" ]; then
   python -m pip install --upgrade pip
+  python -c 'import torch; assert torch.cuda.is_available(), "The selected image must provide CUDA PyTorch before dependency installation."'
   python -m pip install -r server/requirements-llm-grpo.txt
+  python -m pip install --no-build-isolation deepspeed==0.19.5
+  python -m pip install --no-deps -e .
 fi
 
 if [ "$PREPARE_ONLY" = "1" ]; then

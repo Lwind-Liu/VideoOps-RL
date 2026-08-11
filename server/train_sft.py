@@ -3,12 +3,71 @@
 from __future__ import annotations
 
 import argparse
+import copy
+import json
 import os
 from pathlib import Path
+
+try:
+    from server.tool_schemas import TOOL_SCHEMAS
+except ModuleNotFoundError:  # Direct execution: python server/train_sft.py
+    from tool_schemas import TOOL_SCHEMAS
 
 ROOT = Path(__file__).resolve().parents[1]
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+
+
+def _text_content(content: object) -> str | None:
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        for block in content:
+            if isinstance(block, dict) and block.get("type") == "text":
+                return block.get("text")
+    return None
+
+
+def normalize_tool_record(record: dict) -> dict:
+    """Convert legacy JSON action text into TRL's native tool-calling format."""
+    normalized = copy.deepcopy(record)
+    messages = []
+    pending_tool: str | None = None
+    native_calls = 0
+    for message in normalized["messages"]:
+        current = copy.deepcopy(message)
+        if current.get("role") == "assistant":
+            text = _text_content(current.get("content"))
+            try:
+                call = json.loads(text) if text else None
+            except json.JSONDecodeError:
+                call = None
+            if isinstance(call, dict) and isinstance(call.get("tool"), str) and isinstance(call.get("arguments"), dict):
+                pending_tool = call["tool"]
+                current = {
+                    "role": "assistant",
+                    "tool_calls": [{
+                        "type": "function",
+                        "function": {"name": pending_tool, "arguments": call["arguments"]},
+                    }],
+                }
+                native_calls += 1
+        elif current.get("role") == "tool":
+            if pending_tool is None:
+                raise ValueError(f"tool response without assistant call in {record.get('task_id')}")
+            current["name"] = pending_tool
+            pending_tool = None
+        messages.append(current)
+    if native_calls == 0:
+        raise ValueError(f"no tool calls found in {record.get('task_id')}")
+    normalized["messages"] = messages
+    normalized["tools"] = copy.deepcopy(TOOL_SCHEMAS)
+    return normalized
+
+
+def load_sft_records(path: Path) -> list[dict]:
+    with path.open(encoding="utf-8") as handle:
+        return [normalize_tool_record(json.loads(line)) for line in handle if line.strip()]
 
 
 def main() -> None:
@@ -18,12 +77,15 @@ def main() -> None:
     parser.add_argument("--epochs", type=float, default=3.0)
     parser.add_argument("--gradient-accumulation-steps", type=int, default=4)
     args = parser.parse_args()
-    from datasets import load_dataset
+    from datasets import Dataset
     from peft import LoraConfig
     from transformers import AutoProcessor
     from trl import SFTConfig, SFTTrainer
 
-    dataset = load_dataset("json", data_files={"train": str(ROOT / "data/training/sft_train_v2.jsonl"), "validation": str(ROOT / "data/training/sft_val_v2.jsonl")})
+    dataset = {
+        "train": Dataset.from_list(load_sft_records(ROOT / "data/training/sft_train_v2.jsonl"), on_mixed_types="use_json"),
+        "validation": Dataset.from_list(load_sft_records(ROOT / "data/training/sft_val_v2.jsonl"), on_mixed_types="use_json"),
+    }
     config = SFTConfig(
         output_dir=args.output_dir, num_train_epochs=args.epochs, learning_rate=2e-5,
         per_device_train_batch_size=1, gradient_accumulation_steps=args.gradient_accumulation_steps, bf16=True,
