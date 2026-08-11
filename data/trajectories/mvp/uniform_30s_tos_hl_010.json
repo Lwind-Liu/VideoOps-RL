@@ -1,0 +1,31 @@
+{
+  "task": {
+    "task_id": "tos_hl_010",
+    "query": "Find Thom's apology followed by the good ad-lib comment.",
+    "search_terms": [
+      "I'm sorry",
+      "good ad-lib"
+    ],
+    "target_start_ms": 387000,
+    "target_end_ms": 391000,
+    "split": "train"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "uniform_30s_retrieval",
+      "score": 3
+    }
+  ],
+  "result": {
+    "predicted_start_ms": 390000,
+    "predicted_end_ms": 420000,
+    "target_start_ms": 387000,
+    "target_end_ms": 391000,
+    "temporal_iou": 0.030303030303030304,
+    "evidence_supported": false,
+    "audit_passed": false,
+    "success": false,
+    "tool_calls": 1
+  }
+}

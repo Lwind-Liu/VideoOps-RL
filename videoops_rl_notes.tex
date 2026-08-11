@@ -1,0 +1,147 @@
+\documentclass[UTF8,letterpaper,10pt,twocolumn]{ctexart}
+\usepackage[left=0.72in,right=0.72in,top=0.70in,bottom=0.76in,columnsep=0.34in]{geometry}
+\usepackage{amsmath,booktabs,enumitem,hyperref,xcolor}
+\usepackage{titlesec}
+\hypersetup{colorlinks=true,linkcolor=blue!45!black,urlcolor=blue!45!black}
+\setlist{nosep,leftmargin=1.5em}
+\setlength{\parindent}{1em}
+\setlength{\parskip}{0.15em}
+\sloppy
+\titleformat{\section}{\large\bfseries}{\thesection}{0.45em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.4em}{}
+\titlespacing*{\section}{0pt}{1.15ex}{0.42ex}
+\titlespacing*{\subsection}{0pt}{0.85ex}{0.28ex}
+\title{\bfseries VideoOps-RL：多模态多智能体 Agentic RL 全链路笔记}
+\author{}
+\date{Algorithm v2：训练前离线闭环}
+
+\begin{document}
+\maketitle
+\pagestyle{plain}
+\small
+
+\section{问题与项目边界}
+
+输入长视频和一句自然语言查询，系统输出相关高光时间段、证据和完整工具轨迹。普通 VLM 往往直接生成答案；VideoOps-RL 把过程建模为带工具预算的序列决策：检索候选、核验证据、扩展时间上下文、审计，再决定继续或提交。
+
+状态由 query、候选信念、已核验节点、剩余预算和审计状态组成；动作是工具调用；观测是字幕、图像、特征和时间信息；ground truth 只由环境计算奖励，绝不进入公开 prompt。RL 学的是如何取证和停止，不是从零学习视觉知识。
+
+项目与长视频切分、Keyframe/Chunk、结构化剧情理解和内容运营方向对齐，但使用公开数据独立实现，不声称使用企业内部数据、服务或代码。目标是可运行、可消融、面试可解释的工程 POC，不是论文 SOTA。
+
+\section{双数据栈}
+
+\subsection{QVHighlights：规模与人工标签}
+
+接入 QVHighlights 官方人工查询、时间窗口和公开 2 秒 OpenAI CLIP 特征。train/val/test 分别有 7,218/1,550/1,542 个任务，共 10,310 个任务、10,148 个视频；三个 split 的视频交集为 0。原始视频不重新分发，项目只保存运行所需的公开特征、标注、许可证和来源清单。
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+split & 任务 & 视频 & 标注窗口\\
+\midrule
+train & 7,218 & 7,100 & 12,803\\
+val & 1,550 & 1,519 & 2,803\\
+test & 1,542 & 1,529 & 2,761\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{开放电影：原始多模态链路}
+
+三部 Blender CC BY 影片提供 306 个真实关键帧、178 条字幕和 66 个业务式任务。Tears of Steel、Sintel、Big Buck Bunny 按整部视频划分，避免相同角色、画风和字幕泄漏。该数据验证 BM25 字幕检索、CLIP 关键帧检索和图像注入 VLM 的真实工具链。
+
+两套数据互补：QVHighlights 负责规模、人工标签和无手工视觉标签的留出评测；开放电影负责字幕、原始图片和业务流程。GRPO 以 80\%/20\% 混合采样二者。
+
+\section{核心算法}
+
+\subsection{多模态时序证据图}
+
+每个镜头或 2 秒 clip 是一个节点，保存文本分数 $s_i^t$、视觉分数 $s_i^v$、上下文分数 $s_i^c$ 和核验状态。字幕由 BM25 检索，视觉由 OpenAI CLIP ViT-B/32 检索。候选信念使用 Noisy-OR：
+\begin{equation}
+b_i=1-\prod_{m\in\{t,v,c\}}(1-w_m s_i^m).
+\end{equation}
+单个模态的低分不会抹掉另一模态的强证据；多模态共同支持时，信念继续上升。上下文扩展时，中心证据按
+\begin{equation}
+s_j^c=\max\left(s_j^c,b_i e^{-0.7|i-j|}\right)
+\end{equation}
+传播到相邻节点。
+
+\subsection{变量长度时间段解码}
+
+最高相似度的 2 秒 clip 无法覆盖长事件，固定窗口又不适合不同时长。v2 解码器依次执行：五点移动平均；取 72\% 分位数与 $0.52\max(s)$ 的较大值作为动态阈值；提取连续区域；左右各补两个 clip；按 $0.55\,\mathrm{mean}+0.45\,\mathrm{max}$ 排序得到变量长度 proposal。
+
+Agent 先核验 proposal 的 anchor，再调用半径为 0 的上下文扩展接收整个自适应区间。该过程不读取目标标签。
+
+\subsection{权限分离的多 Agent}
+
+QueryRouter 只看 query 和视频是否有对白；TimelineScout 只允许字幕检索与上下文扩展；VisionAnalyst 只允许视觉检索与候选核验；EvidenceAuditor 只做证据审计；Coordinator 读取共享证据图并决定提交。
+
+环境有硬约束：未检索候选不能核验，未核验 anchor 不能扩展，未接地片段不能提交。多 Agent 的实质是状态共享下的职责与权限隔离，而不是多个模型自由聊天。
+
+\section{Reward 与 Agentic RL}
+
+过程奖励用于解决长链路信用分配，包括：正确候选 reciprocal-rank 提升、正确/错误核验、上下文 recall 增益、正确/误报审计、非法动作和非法提交。
+
+终局奖励为
+\begin{align}
+R={}&2.00\,\mathrm{tIoU}+0.35\,F_1^{shot}
+ +0.30\,S_{audit}\nonumber\\
+ &+0.20\,C_{modality}+R_{process}
+ -0.025N_{tool}\nonumber\\
+ &-0.06N_{repeat}-0.20N_{invalid}.
+\end{align}
+QVHighlights 另加最高 0.10 的人工 saliency 奖励。审计分数只由语义信念、模态覆盖和时间连续性计算；标签命中只作为隐藏 reward，不作为模型观察。
+
+只奖励 tIoU 会鼓励猜时间；只奖励审计会鼓励机械调用；只有同时加入过程信号、证据质量和成本，策略才有动力学习“搜什么、看什么、扩多远、何时停”。
+
+\section{训练数据与 24 卡执行}
+
+规则专家运行全部任务，但只有成功且审计通过的轨迹进入 SFT。当前 SFT train/val/test 分别为 3,575/776/782 条。GRPO train 有 9,018 条无标签泄漏采样记录，其中 QVHighlights 7,218 条、开放电影重复为 1,800 条，实现约 80\%/20\% 的特征与原始图像环境混合，并保留成功与失败任务供策略探索。
+
+SFT 先学习合法 JSON、工具参数、证据引用和停止格式；GRPO 每个 prompt 采样 4 条 rollout。外部 dataset 向同组环境传递相同 task ID，避免独立随机抽题造成任务难度噪声，再通过组内相对 reward 优化模态选择、候选核验、时间扩展、审计和停止。直接跳过 SFT 时，大量输出无法形成合法工具调用，组内 reward 接近同一个失败值。
+
+服务器执行顺序：24 卡 ZeRO-2 LoRA SFT；在 GPU 0 合并 LoRA；GPU 20--23 启动 TP=4 vLLM；GPU 0--19 做 GRPO；最后把 val/test 各拆成 12 个 shard 并行评测。脚本自动检测 8/24 卡模式，并包含 vLLM health check、失败退出、进程清理和评测合并。
+
+\section{训练前消融结果}
+
+QVHighlights 完整 val/test 共 3,092 个任务均已评测，无缺失特征。结果使用项目实现的单预测 R@1-style temporal IoU，不能写成官方 mAP。
+
+\begin{center}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrr}
+\toprule
+方法 & V-IoU & V-R@.5 & T-IoU & T-R@.5\\
+\midrule
+峰值 2 s & .054 & .000 & .052 & .000\\
+固定 10 s & .235 & .108 & .227 & .100\\
+自适应 proposal & \textbf{.482} & \textbf{.499} & \textbf{.487} & \textbf{.501}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+这说明当前最明确的算法增益来自动态边界解码，而不是角色包装。40 个本地测试已通过，覆盖融合信念、硬约束、标签隔离、同组状态固定、时序 proposal、审计和多片段提交。
+
+\section{诚实边界与服务器验收}
+
+已完成：公开数据与特征、查询向量、原始多模态证据、环境、工具、时序图、过程/终局 reward、成功 SFT 轨迹、GRPO prompt、消融、测试、模型权重和离线打包。
+
+未完成：H200 上的 SFT/GRPO、训练后工具合法率、组内 reward 方差、吞吐/显存和 checkpoint 指标。因此当前只能写“实现全链路并完成训练前消融”，训练跑完后才能写“完成 SFT+GRPO 并提升指标”。
+
+Smoke go 条件：24 卡和全部离线资产通过预检；SFT loss 正常下降；工具 JSON 可解析；四条 rollout 的 reward 有方差；关键帧真正进入 VLM；vLLM 服务健康；显存不超过容量 90\%。任一项失败就停止 200-step 正式 POC。
+
+\section{面试两分钟讲法}
+
+我把长视频查询定位建模成受工具预算约束的 Agentic RL。底层用 BM25 和 CLIP 构建候选，再用 Noisy-OR 时序证据图融合模态并传播上下文。为解决单 clip 峰值无法覆盖长事件，我实现了平滑、动态阈值、连通区域和 proposal ranking 的变量长度解码器，在 QVHighlights 完整 val/test 上把固定 10 秒窗口约 10\% 的 R@1@0.5 提升到约 50\%。上层把检索、视觉核验、审计和协调拆成权限隔离的 Agent，并用硬接地约束防止伪造证据。训练采用成功轨迹 LoRA SFT，24 卡模式下做 20+4 卡 GRPO/vLLM，并用 24 卡并行评测；训练后增益等 H200 日志产生后再报告。
+
+\subsection{关键追问}
+
+\textbf{为什么需要 RL？} 因为模态选择、搜索、核验、扩展、审计和停止构成有成本的序列决策，单条监督轨迹不能直接优化效果与成本的全局折中。
+
+\textbf{多 Agent 有什么算法意义？} 它约束动作空间与证据权限，并通过共享证据图协作；不是为了增加角色数量。
+
+\textbf{数据真实吗？} QVHighlights 是公开人工查询/时间标注，开放电影是真实公开媒体；不冒充生产数据。公开电影少量媒体标签只作辅助，零手工标签结论以 QVHighlights 为准。
+
+\textbf{最大的风险？} GRPO 训练效果尚未产生；SFT teacher 只有约一半任务成功，因此只保留成功轨迹，失败 prompt 留给 RL 探索。
+
+\end{document}

@@ -1,0 +1,198 @@
+{
+  "task": {
+    "task_id": "tos_hl_001",
+    "query": "Find the opening argument about the robot hand and robotic-claw nightmare.",
+    "search_terms": [
+      "robot hand",
+      "freaked out",
+      "nightmares",
+      "robotic claws"
+    ],
+    "target_start_ms": 10800,
+    "target_end_ms": 25000,
+    "split": "train"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "search",
+      "state_before": {
+        "searched": false,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": null,
+        "candidate_end_ms": null,
+        "candidate_shot_ids": [],
+        "confidence": 0.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [],
+        "tool_calls": 0,
+        "done": false
+      },
+      "result": {
+        "hits": 4,
+        "matched_terms": [
+          "freaked out",
+          "nightmares",
+          "robot hand",
+          "robotic claws"
+        ]
+      },
+      "reward": -0.05
+    },
+    {
+      "step": 2,
+      "action": "inspect",
+      "state_before": {
+        "searched": true,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 8800,
+        "candidate_end_ms": 24000,
+        "candidate_shot_ids": [
+          "shot_0002",
+          "shot_0003",
+          "shot_0004"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [
+          "Why don't you just admit that\nyou're freaked out by my robot hand?",
+          "I'm not freaked out by- it's...",
+          "I'm freaked out! I have nightmares\nthat I'm being chased...",
+          "...by these giant robotic claws of death..."
+        ],
+        "tool_calls": 1,
+        "done": false
+      },
+      "result": {
+        "shot_id": "shot_0003",
+        "keyframe_path": "keyframes/shot_0003.jpg",
+        "visual_tags": [
+          "robotic claws",
+          "hologram",
+          "nightmare visualization"
+        ]
+      },
+      "reward": 0.0
+    },
+    {
+      "step": 3,
+      "action": "audit",
+      "state_before": {
+        "searched": true,
+        "inspected": true,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 8800,
+        "candidate_end_ms": 24000,
+        "candidate_shot_ids": [
+          "shot_0002",
+          "shot_0003",
+          "shot_0004"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": "shot_0003",
+        "inspected_keyframe": "keyframes/shot_0003.jpg",
+        "visual_tags": [
+          "robotic claws",
+          "hologram",
+          "nightmare visualization"
+        ],
+        "transcript_evidence": [
+          "Why don't you just admit that\nyou're freaked out by my robot hand?",
+          "I'm not freaked out by- it's...",
+          "I'm freaked out! I have nightmares\nthat I'm being chased...",
+          "...by these giant robotic claws of death..."
+        ],
+        "tool_calls": 2,
+        "done": false
+      },
+      "result": {
+        "agent": "EvidenceAuditor",
+        "passed": true,
+        "transcript_ok": true,
+        "keyframe_ok": true
+      },
+      "reward": 0.05
+    },
+    {
+      "step": 4,
+      "action": "submit",
+      "state_before": {
+        "searched": true,
+        "inspected": true,
+        "expanded": false,
+        "audited": true,
+        "audit_passed": true,
+        "candidate_start_ms": 8800,
+        "candidate_end_ms": 24000,
+        "candidate_shot_ids": [
+          "shot_0002",
+          "shot_0003",
+          "shot_0004"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": "shot_0003",
+        "inspected_keyframe": "keyframes/shot_0003.jpg",
+        "visual_tags": [
+          "robotic claws",
+          "hologram",
+          "nightmare visualization"
+        ],
+        "transcript_evidence": [
+          "Why don't you just admit that\nyou're freaked out by my robot hand?",
+          "I'm not freaked out by- it's...",
+          "I'm freaked out! I have nightmares\nthat I'm being chased...",
+          "...by these giant robotic claws of death..."
+        ],
+        "tool_calls": 3,
+        "done": false
+      },
+      "result": {
+        "task_reward": 2.3296296296296295,
+        "predicted_start_ms": 8800,
+        "predicted_end_ms": 24000,
+        "target_start_ms": 10800,
+        "target_end_ms": 25000,
+        "temporal_iou": 0.8148148148148148,
+        "evidence_supported": true,
+        "audit_passed": true,
+        "success": true,
+        "evidence_shot_ids": [
+          "shot_0002",
+          "shot_0003",
+          "shot_0004"
+        ],
+        "keyframe_path": "keyframes/shot_0003.jpg"
+      },
+      "reward": 2.3296296296296295
+    }
+  ],
+  "result": {
+    "task_reward": 2.3296296296296295,
+    "predicted_start_ms": 8800,
+    "predicted_end_ms": 24000,
+    "target_start_ms": 10800,
+    "target_end_ms": 25000,
+    "temporal_iou": 0.8148148148148148,
+    "evidence_supported": true,
+    "audit_passed": true,
+    "success": true,
+    "evidence_shot_ids": [
+      "shot_0002",
+      "shot_0003",
+      "shot_0004"
+    ],
+    "keyframe_path": "keyframes/shot_0003.jpg"
+  }
+}

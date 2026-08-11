@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "artifact_id": "tears_of_steel_s1_20s_500s",
+  "parent_media_id": "tears_of_steel_2012",
+  "parent_video_sha256": "EFA9062D9CDB7A338E40AD530DFDF234806743F29AE6A1A136B97ECE4E588E8F",
+  "source_interval": {
+    "start_seconds": 20.0,
+    "end_seconds": 500.0,
+    "duration_seconds": 480.0
+  },
+  "sample_timeline": {
+    "start_seconds": 0.0,
+    "end_seconds": 480.0
+  },
+  "reproduction_command": "powershell -ExecutionPolicy Bypass -File scripts/prepare_s1_sample.ps1",
+  "sample_encoding": {
+    "video": "libx264 preset=fast crf=18 yuv420p",
+    "audio": "aac 192k stereo 44100Hz",
+    "reason": "accurate cut and zero-based timestamps"
+  },
+  "outputs": [
+    {
+      "path": "data/processed/tears_of_steel/s1/sample_20s_500s.mp4",
+      "bytes": 190973299,
+      "sha256": "2D5A982D1F3A98FC0FC01E22960C5ECA14B98AD6681A3F78EF8E61AF9E0F2116",
+      "duration_seconds": 480.0,
+      "streams": ["h264_video", "aac_audio"]
+    },
+    {
+      "path": "data/processed/tears_of_steel/s1/video_only.mp4",
+      "bytes": 179055390,
+      "sha256": "951BE5461AA17A1BEA47E48654EF09518CC6793A1224EA5CCD55DE698B61E6C1",
+      "duration_seconds": 480.0,
+      "streams": ["h264_video"]
+    },
+    {
+      "path": "data/processed/tears_of_steel/s1/audio_asr_16k_mono.wav",
+      "bytes": 15360078,
+      "sha256": "8074F25FCFC0AF939EACAB7DADFE2F20E818CF4E9AEFE8DB53378E2435E95623",
+      "duration_seconds": 480.0,
+      "streams": ["pcm_s16le_audio"],
+      "sample_rate": 16000,
+      "channels": 1
+    },
+    {
+      "path": "data/processed/tears_of_steel/s1/subtitles_en.srt",
+      "bytes": 4195,
+      "sha256": "9091563572BA8EA6B350487CECC456F5C542D7BA28E7F9D2C84B3D6166AAB286",
+      "cue_count": 67,
+      "first_cue_start_seconds": 3.0,
+      "last_cue_end_seconds": 474.0
+    }
+  ],
+  "validation": {
+    "all_media_duration_seconds": 480.0,
+    "all_media_start_at_zero": true,
+    "video_only_has_audio": false,
+    "asr_audio_is_16k_mono": true,
+    "subtitle_within_sample_interval": true,
+    "subtitle_clipper_tests": "passed"
+  }
+}
+

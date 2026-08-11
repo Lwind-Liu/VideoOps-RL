@@ -1,0 +1,22 @@
+{
+  "shot_0002": ["bridge", "man and woman", "robot hand"],
+  "shot_0003": ["robotic claws", "hologram", "nightmare visualization"],
+  "shot_0006": ["laboratory", "robot control", "memory system"],
+  "shot_0008": ["scientist", "control interface", "laboratory"],
+  "shot_0016": ["interior conversation", "characters"],
+  "shot_0017": ["interior conversation", "characters"],
+  "shot_0025": ["production set", "crew", "countdown"],
+  "shot_0027": ["production set", "people moving"],
+  "shot_0037": ["action set", "performers", "memory overwrite"],
+  "shot_0040": ["control interface", "memory overwrite"],
+  "shot_0048": ["robot hand confrontation", "characters"],
+  "shot_0050": ["laboratory confrontation", "characters"],
+  "shot_0053": ["countdown", "laboratory crew"],
+  "shot_0055": ["crew rushing", "production set"],
+  "shot_0063": ["failed take", "chaos", "performer"],
+  "shot_0067": ["falling", "action", "chaos"],
+  "shot_0070": ["giant robot", "confrontation", "Thom"],
+  "shot_0072": ["robot confrontation", "close-up"],
+  "shot_0078": ["Thom", "apology", "close-up"],
+  "shot_0079": ["production set", "reaction" ]
+}

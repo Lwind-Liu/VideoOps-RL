@@ -1,0 +1,32 @@
+__pycache__/
+*.py[cod]
+*.aux
+*.log
+*.out
+.pytest_cache/
+.venv*/
+tmp/
+dist/
+artifacts/
+external/
+models/
+wheelhouse/
+outputs/
+tmp_bbb_search.json
+data/external/qvhighlights/features/
+data/external/qvhighlights/query_embeddings_vit_b32.npz
+data/indexes/
+
+# Large media and generated outputs stay local or are downloaded on the server.
+data/raw/
+data/processed/**/*.mp4
+data/processed/**/*.mov
+data/processed/**/*.wav
+data/processed/**/keyframes/
+outputs/highlights/*.mp4
+
+# Model caches and experiment trackers.
+.cache/
+wandb/
+mlruns/
+checkpoints/

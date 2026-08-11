@@ -1,0 +1,201 @@
+{
+  "task": {
+    "task_id": "tos_hl_006",
+    "query": "Find the later confrontation about the robot hand and destroying the world.",
+    "search_terms": [
+      "robot hand",
+      "I was young",
+      "destroy the world"
+    ],
+    "target_start_ms": 327000,
+    "target_end_ms": 343000,
+    "split": "eval"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "search",
+      "state_before": {
+        "searched": false,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": null,
+        "candidate_end_ms": null,
+        "candidate_shot_ids": [],
+        "confidence": 0.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [],
+        "tool_calls": 0,
+        "done": false
+      },
+      "result": {
+        "hits": 3,
+        "matched_terms": [
+          "I was young",
+          "destroy the world",
+          "robot hand"
+        ]
+      },
+      "reward": -0.05
+    },
+    {
+      "step": 2,
+      "action": "inspect",
+      "state_before": {
+        "searched": true,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 325000,
+        "candidate_end_ms": 345000,
+        "candidate_shot_ids": [
+          "shot_0054",
+          "shot_0055",
+          "shot_0056",
+          "shot_0057",
+          "shot_0058",
+          "shot_0059",
+          "shot_0060"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [
+          "Why don't you just admit that you're\nfreaked out by my robot hand?",
+          "Listen Celia, I was young...",
+          "But that's no reason to\ndestroy the world."
+        ],
+        "tool_calls": 1,
+        "done": false
+      },
+      "result": {
+        "shot_id": "shot_0057",
+        "keyframe_path": "keyframes/shot_0057.jpg",
+        "visual_tags": []
+      },
+      "reward": 0.0
+    },
+    {
+      "step": 3,
+      "action": "audit",
+      "state_before": {
+        "searched": true,
+        "inspected": true,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 325000,
+        "candidate_end_ms": 345000,
+        "candidate_shot_ids": [
+          "shot_0054",
+          "shot_0055",
+          "shot_0056",
+          "shot_0057",
+          "shot_0058",
+          "shot_0059",
+          "shot_0060"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": "shot_0057",
+        "inspected_keyframe": "keyframes/shot_0057.jpg",
+        "visual_tags": [],
+        "transcript_evidence": [
+          "Why don't you just admit that you're\nfreaked out by my robot hand?",
+          "Listen Celia, I was young...",
+          "But that's no reason to\ndestroy the world."
+        ],
+        "tool_calls": 2,
+        "done": false
+      },
+      "result": {
+        "agent": "EvidenceAuditor",
+        "passed": true,
+        "transcript_ok": true,
+        "keyframe_ok": true
+      },
+      "reward": 0.05
+    },
+    {
+      "step": 4,
+      "action": "submit",
+      "state_before": {
+        "searched": true,
+        "inspected": true,
+        "expanded": false,
+        "audited": true,
+        "audit_passed": true,
+        "candidate_start_ms": 325000,
+        "candidate_end_ms": 345000,
+        "candidate_shot_ids": [
+          "shot_0054",
+          "shot_0055",
+          "shot_0056",
+          "shot_0057",
+          "shot_0058",
+          "shot_0059",
+          "shot_0060"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": "shot_0057",
+        "inspected_keyframe": "keyframes/shot_0057.jpg",
+        "visual_tags": [],
+        "transcript_evidence": [
+          "Why don't you just admit that you're\nfreaked out by my robot hand?",
+          "Listen Celia, I was young...",
+          "But that's no reason to\ndestroy the world."
+        ],
+        "tool_calls": 3,
+        "done": false
+      },
+      "result": {
+        "task_reward": 2.3,
+        "predicted_start_ms": 325000,
+        "predicted_end_ms": 345000,
+        "target_start_ms": 327000,
+        "target_end_ms": 343000,
+        "temporal_iou": 0.8,
+        "evidence_supported": true,
+        "audit_passed": true,
+        "success": true,
+        "evidence_shot_ids": [
+          "shot_0054",
+          "shot_0055",
+          "shot_0056",
+          "shot_0057",
+          "shot_0058",
+          "shot_0059",
+          "shot_0060"
+        ],
+        "keyframe_path": "keyframes/shot_0057.jpg"
+      },
+      "reward": 2.3
+    }
+  ],
+  "result": {
+    "task_reward": 2.3,
+    "predicted_start_ms": 325000,
+    "predicted_end_ms": 345000,
+    "target_start_ms": 327000,
+    "target_end_ms": 343000,
+    "temporal_iou": 0.8,
+    "evidence_supported": true,
+    "audit_passed": true,
+    "success": true,
+    "evidence_shot_ids": [
+      "shot_0054",
+      "shot_0055",
+      "shot_0056",
+      "shot_0057",
+      "shot_0058",
+      "shot_0059",
+      "shot_0060"
+    ],
+    "keyframe_path": "keyframes/shot_0057.jpg"
+  }
+}

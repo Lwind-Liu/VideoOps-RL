@@ -1,0 +1,17 @@
+{
+  "method": "ffmpeg_scene_score",
+  "input": "data/processed/tears_of_steel/s1/video_only.mp4",
+  "threshold": 0.35,
+  "duration_s": 480.0,
+  "fps": 24.0,
+  "transition_count": 97,
+  "shot_count": 98,
+  "shot_duration_s": {
+    "min": 0.5,
+    "median": 3.0,
+    "mean": 4.8979591836734695,
+    "max": 37.208333
+  },
+  "boundary_semantics": "transition timestamp is the first frame of the new shot",
+  "keyframe_policy": "temporal midpoint of each shot"
+}

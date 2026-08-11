@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "media_id": "tears_of_steel_2012",
+  "title": "Tears of Steel",
+  "downloaded_at": "2026-08-10",
+  "attribution": "(CC) Blender Foundation - Tears of Steel",
+  "license": {
+    "name": "Creative Commons Attribution 3.0",
+    "url": "https://creativecommons.org/licenses/by/3.0/",
+    "official_statement": "https://mango.blender.org/about/"
+  },
+  "sources": {
+    "video": "https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov",
+    "subtitle_en": "https://download.blender.org/demo/movies/ToS/subtitles/TOS-en.srt",
+    "subtitle_zh": "https://download.blender.org/demo/movies/ToS/subtitles/TOS-CH.srt"
+  },
+  "files": [
+    {
+      "path": "data/raw/tears_of_steel/tears_of_steel_720p.mov",
+      "bytes": 372178639,
+      "sha256": "EFA9062D9CDB7A338E40AD530DFDF234806743F29AE6A1A136B97ECE4E588E8F"
+    },
+    {
+      "path": "data/raw/tears_of_steel/TOS-en.srt",
+      "bytes": 4764,
+      "sha256": "CE9578F6FE098A5821045A38884B229160F9E7BA27890448A92F5BE330C6E6FE",
+      "role": "canonical_subtitle",
+      "cue_count": 76,
+      "invalid_time_lines": 0
+    },
+    {
+      "path": "data/raw/tears_of_steel/TOS-CH.srt",
+      "bytes": 4945,
+      "sha256": "456152557F85F5874EC7C96C99A68FF05C325013972CA059B193F0D93F036D45",
+      "role": "auxiliary_translation",
+      "cue_count": 77,
+      "invalid_time_lines": 1,
+      "quality_note": "The first timestamp line has an incomplete end timestamp; do not use as canonical alignment."
+    }
+  ],
+  "container": {
+    "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+    "duration_seconds": 734.166667,
+    "bit_rate": 4055522,
+    "start_time_seconds": 0.0
+  },
+  "streams": [
+    {
+      "index": 0,
+      "codec_type": "video",
+      "codec_name": "h264",
+      "profile": "Main",
+      "width": 1280,
+      "height": 534,
+      "pixel_format": "yuv420p",
+      "frame_rate": "24/1",
+      "time_base": "1/24",
+      "duration_seconds": 734.166667
+    },
+    {
+      "index": 1,
+      "codec_type": "audio",
+      "codec_name": "mp3",
+      "sample_rate": 44100,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "time_base": "1/44100",
+      "duration_seconds": 734.093061
+    }
+  ],
+  "processing_policy": {
+    "preserve_raw_files": true,
+    "canonical_subtitle": "TOS-en.srt",
+    "experiment_clip": "to_be_derived_without_overwriting_source"
+  }
+}
+

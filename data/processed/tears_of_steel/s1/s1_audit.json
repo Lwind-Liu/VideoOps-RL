@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "media_id": "tears_of_steel_s1_20s_500s",
+  "all_passed": true,
+  "passed": 10,
+  "total": 10,
+  "checks": [
+    {
+      "name": "shot_timeline_contiguous",
+      "passed": true,
+      "details": "98 shots cover 0..480000 ms without gaps or overlaps"
+    },
+    {
+      "name": "record_ids_unique",
+      "passed": true,
+      "details": "shot_ids=98, utterance_ids=67"
+    },
+    {
+      "name": "one_keyframe_per_shot",
+      "passed": true,
+      "details": "referenced=98, discovered=98, shots=98"
+    },
+    {
+      "name": "utterances_within_timeline",
+      "passed": true,
+      "details": "67 utterances checked against 0..480000 ms"
+    },
+    {
+      "name": "evidence_units_match_shots",
+      "passed": true,
+      "details": "evidence_units=98, shots=98"
+    },
+    {
+      "name": "utterance_references_exact",
+      "passed": true,
+      "details": "validated 88 shot-utterance overlap records"
+    },
+    {
+      "name": "all_utterances_linked",
+      "passed": true,
+      "details": "all utterances linked"
+    },
+    {
+      "name": "media_durations_match_timeline",
+      "passed": true,
+      "details": "sample, video-only, and ASR audio are within 100 ms of 480000 ms"
+    },
+    {
+      "name": "stream_layout_expected",
+      "passed": true,
+      "details": "sample=['video', 'audio'], video_only=['video'], asr=16000Hz mono"
+    },
+    {
+      "name": "manifest_hashes_match",
+      "passed": true,
+      "details": "sample, video, audio, and subtitle hashes match frozen S1 manifest"
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "task": {
+    "task_id": "tos_hl_004",
+    "query": "Find the production countdown when all systems are ready and everyone is told to go.",
+    "search_terms": [
+      "all systems go",
+      "go go go",
+      "I love it"
+    ],
+    "target_start_ms": 183500,
+    "target_end_ms": 197000,
+    "split": "train"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "search",
+      "state_before": {
+        "searched": false,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": null,
+        "candidate_end_ms": null,
+        "candidate_shot_ids": [],
+        "confidence": 0.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [],
+        "tool_calls": 0,
+        "done": false
+      },
+      "result": {
+        "hits": 3,
+        "matched_terms": [
+          "I love it",
+          "all systems go",
+          "go go go"
+        ]
+      },
+      "reward": -0.05
+    },
+    {
+      "step": 2,
+      "action": "inspect",
+      "state_before": {
+        "searched": true,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 181500,
+        "candidate_end_ms": 199000,
+        "candidate_shot_ids": [
+          "shot_0026",
+          "shot_0027",
+          "shot_0028",
+          "shot_0029",
+          "shot_0030",
+          "shot_0031"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [
+          "We're on in one! All systems go!\nYeah you, go!",
+          "Go! Move your asses! Go go go!",
+          "I love it! Come on, go!"
+        ],
+        "tool_calls": 1,
+        "done": false
+      },
+      "result": {
+        "shot_id": "shot_0029",
+        "keyframe_path": "keyframes/shot_0029.jpg",
+        "visual_tags": []
+      },
+      "reward": 0.0
+    },
+    {
+      "step": 3,
+      "action": "submit",
+      "state_before": {
+        "searched": true,
+        "inspected": true,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 181500,
+        "candidate_end_ms": 199000,
+        "candidate_shot_ids": [
+          "shot_0026",
+          "shot_0027",
+          "shot_0028",
+          "shot_0029",
+          "shot_0030",
+          "shot_0031"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": "shot_0029",
+        "inspected_keyframe": "keyframes/shot_0029.jpg",
+        "visual_tags": [],
+        "transcript_evidence": [
+          "We're on in one! All systems go!\nYeah you, go!",
+          "Go! Move your asses! Go go go!",
+          "I love it! Come on, go!"
+        ],
+        "tool_calls": 2,
+        "done": false
+      },
+      "result": {
+        "task_reward": 1.942857142857143,
+        "predicted_start_ms": 181500,
+        "predicted_end_ms": 199000,
+        "target_start_ms": 183500,
+        "target_end_ms": 197000,
+        "temporal_iou": 0.7714285714285715,
+        "evidence_supported": true,
+        "audit_passed": false,
+        "success": true,
+        "evidence_shot_ids": [
+          "shot_0026",
+          "shot_0027",
+          "shot_0028",
+          "shot_0029",
+          "shot_0030",
+          "shot_0031"
+        ],
+        "keyframe_path": "keyframes/shot_0029.jpg"
+      },
+      "reward": 1.942857142857143
+    }
+  ],
+  "result": {
+    "task_reward": 1.942857142857143,
+    "predicted_start_ms": 181500,
+    "predicted_end_ms": 199000,
+    "target_start_ms": 183500,
+    "target_end_ms": 197000,
+    "temporal_iou": 0.7714285714285715,
+    "evidence_supported": true,
+    "audit_passed": false,
+    "success": true,
+    "evidence_shot_ids": [
+      "shot_0026",
+      "shot_0027",
+      "shot_0028",
+      "shot_0029",
+      "shot_0030",
+      "shot_0031"
+    ],
+    "keyframe_path": "keyframes/shot_0029.jpg"
+  }
+}

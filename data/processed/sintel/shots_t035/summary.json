@@ -1,0 +1,17 @@
+{
+  "method": "ffmpeg_scene_score",
+  "input": "data/raw/sintel/sintel_360p.mp4",
+  "threshold": 0.35,
+  "duration_s": 888.092993,
+  "fps": 24.0,
+  "transition_count": 89,
+  "shot_count": 90,
+  "shot_duration_s": {
+    "min": 0.041666,
+    "median": 2.8541665,
+    "mean": 9.867699922222222,
+    "max": 143.967993
+  },
+  "boundary_semantics": "transition timestamp is the first frame of the new shot",
+  "keyframe_policy": "temporal midpoint of each shot"
+}

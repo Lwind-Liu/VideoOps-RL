@@ -1,0 +1,32 @@
+{
+  "task": {
+    "task_id": "tos_hl_006",
+    "query": "Find the later confrontation about the robot hand and destroying the world.",
+    "search_terms": [
+      "robot hand",
+      "I was young",
+      "destroy the world"
+    ],
+    "target_start_ms": 327000,
+    "target_end_ms": 343000,
+    "split": "eval"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "uniform_30s_retrieval",
+      "score": 6
+    }
+  ],
+  "result": {
+    "predicted_start_ms": 330000,
+    "predicted_end_ms": 360000,
+    "target_start_ms": 327000,
+    "target_end_ms": 343000,
+    "temporal_iou": 0.3939393939393939,
+    "evidence_supported": false,
+    "audit_passed": false,
+    "success": false,
+    "tool_calls": 1
+  }
+}

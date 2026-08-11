@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "videoops.task.v1",
+  "title": "VideoOps-RL grounded temporal task",
+  "type": "object",
+  "required": ["schema_version", "task_id", "video_id", "split", "query", "target_segments", "evidence"],
+  "properties": {
+    "schema_version": {"const": "videoops.task.v1"},
+    "task_id": {"type": "string", "minLength": 1},
+    "video_id": {"type": "string", "minLength": 1},
+    "split": {"enum": ["smoke", "train", "val", "test"]},
+    "query": {"type": "string", "minLength": 1},
+    "target_segments": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["start_ms", "end_ms"],
+        "properties": {
+          "start_ms": {"type": "integer", "minimum": 0},
+          "end_ms": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["search_terms", "shot_ids", "required_modalities"],
+      "properties": {
+        "search_terms": {"type": "array", "items": {"type": "string"}},
+        "shot_ids": {"type": "array", "items": {"type": "string"}},
+        "required_modalities": {"type": "array", "items": {"enum": ["text", "image", "audio", "video"]}}
+      }
+    }
+  }
+}

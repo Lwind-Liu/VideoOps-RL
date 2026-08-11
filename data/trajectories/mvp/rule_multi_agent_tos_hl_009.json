@@ -1,0 +1,210 @@
+{
+  "task": {
+    "task_id": "tos_hl_009",
+    "query": "Find the robot confrontation about a broken heart, being forgotten, and crushing Thom.",
+    "search_terms": [
+      "broke my heart",
+      "forgot me",
+      "crush you"
+    ],
+    "target_start_ms": 363000,
+    "target_end_ms": 373000,
+    "split": "eval"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "search",
+      "state_before": {
+        "searched": false,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": null,
+        "candidate_end_ms": null,
+        "candidate_shot_ids": [],
+        "confidence": 0.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [],
+        "tool_calls": 0,
+        "done": false
+      },
+      "result": {
+        "hits": 3,
+        "matched_terms": [
+          "broke my heart",
+          "crush you",
+          "forgot me"
+        ]
+      },
+      "reward": -0.05
+    },
+    {
+      "step": 2,
+      "action": "inspect",
+      "state_before": {
+        "searched": true,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 361000,
+        "candidate_end_ms": 375000,
+        "candidate_shot_ids": [
+          "shot_0069",
+          "shot_0070",
+          "shot_0071",
+          "shot_0072",
+          "shot_0073",
+          "shot_0074",
+          "shot_0075"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [
+          "You broke my heart.",
+          "You forgot me on earth.",
+          "I should just crush you."
+        ],
+        "tool_calls": 1,
+        "done": false
+      },
+      "result": {
+        "shot_id": "shot_0072",
+        "keyframe_path": "keyframes/shot_0072.jpg",
+        "visual_tags": [
+          "robot confrontation",
+          "close-up"
+        ]
+      },
+      "reward": 0.0
+    },
+    {
+      "step": 3,
+      "action": "audit",
+      "state_before": {
+        "searched": true,
+        "inspected": true,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 361000,
+        "candidate_end_ms": 375000,
+        "candidate_shot_ids": [
+          "shot_0069",
+          "shot_0070",
+          "shot_0071",
+          "shot_0072",
+          "shot_0073",
+          "shot_0074",
+          "shot_0075"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": "shot_0072",
+        "inspected_keyframe": "keyframes/shot_0072.jpg",
+        "visual_tags": [
+          "robot confrontation",
+          "close-up"
+        ],
+        "transcript_evidence": [
+          "You broke my heart.",
+          "You forgot me on earth.",
+          "I should just crush you."
+        ],
+        "tool_calls": 2,
+        "done": false
+      },
+      "result": {
+        "agent": "EvidenceAuditor",
+        "passed": true,
+        "transcript_ok": true,
+        "keyframe_ok": true
+      },
+      "reward": 0.05
+    },
+    {
+      "step": 4,
+      "action": "submit",
+      "state_before": {
+        "searched": true,
+        "inspected": true,
+        "expanded": false,
+        "audited": true,
+        "audit_passed": true,
+        "candidate_start_ms": 361000,
+        "candidate_end_ms": 375000,
+        "candidate_shot_ids": [
+          "shot_0069",
+          "shot_0070",
+          "shot_0071",
+          "shot_0072",
+          "shot_0073",
+          "shot_0074",
+          "shot_0075"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": "shot_0072",
+        "inspected_keyframe": "keyframes/shot_0072.jpg",
+        "visual_tags": [
+          "robot confrontation",
+          "close-up"
+        ],
+        "transcript_evidence": [
+          "You broke my heart.",
+          "You forgot me on earth.",
+          "I should just crush you."
+        ],
+        "tool_calls": 3,
+        "done": false
+      },
+      "result": {
+        "task_reward": 2.1285714285714286,
+        "predicted_start_ms": 361000,
+        "predicted_end_ms": 375000,
+        "target_start_ms": 363000,
+        "target_end_ms": 373000,
+        "temporal_iou": 0.7142857142857143,
+        "evidence_supported": true,
+        "audit_passed": true,
+        "success": true,
+        "evidence_shot_ids": [
+          "shot_0069",
+          "shot_0070",
+          "shot_0071",
+          "shot_0072",
+          "shot_0073",
+          "shot_0074",
+          "shot_0075"
+        ],
+        "keyframe_path": "keyframes/shot_0072.jpg"
+      },
+      "reward": 2.1285714285714286
+    }
+  ],
+  "result": {
+    "task_reward": 2.1285714285714286,
+    "predicted_start_ms": 361000,
+    "predicted_end_ms": 375000,
+    "target_start_ms": 363000,
+    "target_end_ms": 373000,
+    "temporal_iou": 0.7142857142857143,
+    "evidence_supported": true,
+    "audit_passed": true,
+    "success": true,
+    "evidence_shot_ids": [
+      "shot_0069",
+      "shot_0070",
+      "shot_0071",
+      "shot_0072",
+      "shot_0073",
+      "shot_0074",
+      "shot_0075"
+    ],
+    "keyframe_path": "keyframes/shot_0072.jpg"
+  }
+}

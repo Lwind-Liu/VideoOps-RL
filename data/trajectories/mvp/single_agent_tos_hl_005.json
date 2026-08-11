@@ -1,0 +1,167 @@
+{
+  "task": {
+    "task_id": "tos_hl_005",
+    "query": "Find the action cue and the start of the memory overwrite.",
+    "search_terms": [
+      "and action",
+      "memory overwrite in progress",
+      "jerk Thom"
+    ],
+    "target_start_ms": 272000,
+    "target_end_ms": 281000,
+    "split": "train"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "search",
+      "state_before": {
+        "searched": false,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": null,
+        "candidate_end_ms": null,
+        "candidate_shot_ids": [],
+        "confidence": 0.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [],
+        "tool_calls": 0,
+        "done": false
+      },
+      "result": {
+        "hits": 3,
+        "matched_terms": [
+          "and action",
+          "jerk Thom",
+          "memory overwrite in progress"
+        ]
+      },
+      "reward": -0.05
+    },
+    {
+      "step": 2,
+      "action": "inspect",
+      "state_before": {
+        "searched": true,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 270000,
+        "candidate_end_ms": 283000,
+        "candidate_shot_ids": [
+          "shot_0037",
+          "shot_0038",
+          "shot_0039",
+          "shot_0040",
+          "shot_0041",
+          "shot_0042",
+          "shot_0043"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [
+          "...and, action!",
+          "Memory overwrite in progress!",
+          "You're a jerk, Thom!"
+        ],
+        "tool_calls": 1,
+        "done": false
+      },
+      "result": {
+        "shot_id": "shot_0040",
+        "keyframe_path": "keyframes/shot_0040.jpg",
+        "visual_tags": [
+          "control interface",
+          "memory overwrite"
+        ]
+      },
+      "reward": 0.0
+    },
+    {
+      "step": 3,
+      "action": "submit",
+      "state_before": {
+        "searched": true,
+        "inspected": true,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 270000,
+        "candidate_end_ms": 283000,
+        "candidate_shot_ids": [
+          "shot_0037",
+          "shot_0038",
+          "shot_0039",
+          "shot_0040",
+          "shot_0041",
+          "shot_0042",
+          "shot_0043"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": "shot_0040",
+        "inspected_keyframe": "keyframes/shot_0040.jpg",
+        "visual_tags": [
+          "control interface",
+          "memory overwrite"
+        ],
+        "transcript_evidence": [
+          "...and, action!",
+          "Memory overwrite in progress!",
+          "You're a jerk, Thom!"
+        ],
+        "tool_calls": 2,
+        "done": false
+      },
+      "result": {
+        "task_reward": 1.7846153846153845,
+        "predicted_start_ms": 270000,
+        "predicted_end_ms": 283000,
+        "target_start_ms": 272000,
+        "target_end_ms": 281000,
+        "temporal_iou": 0.6923076923076923,
+        "evidence_supported": true,
+        "audit_passed": false,
+        "success": true,
+        "evidence_shot_ids": [
+          "shot_0037",
+          "shot_0038",
+          "shot_0039",
+          "shot_0040",
+          "shot_0041",
+          "shot_0042",
+          "shot_0043"
+        ],
+        "keyframe_path": "keyframes/shot_0040.jpg"
+      },
+      "reward": 1.7846153846153845
+    }
+  ],
+  "result": {
+    "task_reward": 1.7846153846153845,
+    "predicted_start_ms": 270000,
+    "predicted_end_ms": 283000,
+    "target_start_ms": 272000,
+    "target_end_ms": 281000,
+    "temporal_iou": 0.6923076923076923,
+    "evidence_supported": true,
+    "audit_passed": false,
+    "success": true,
+    "evidence_shot_ids": [
+      "shot_0037",
+      "shot_0038",
+      "shot_0039",
+      "shot_0040",
+      "shot_0041",
+      "shot_0042",
+      "shot_0043"
+    ],
+    "keyframe_path": "keyframes/shot_0040.jpg"
+  }
+}

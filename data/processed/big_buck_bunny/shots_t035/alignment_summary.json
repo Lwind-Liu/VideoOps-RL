@@ -1,0 +1,16 @@
+{
+  "method": "half_open_interval_overlap",
+  "interval_semantics": "[start_ms, end_ms)",
+  "shots_source": "data/processed/big_buck_bunny/shots_t035/shots.jsonl",
+  "subtitles_source": "data/raw/big_buck_bunny/empty.srt",
+  "language": "none",
+  "shot_count": 118,
+  "utterance_count": 0,
+  "shot_utterance_link_count": 0,
+  "shots_with_dialogue": 0,
+  "shots_without_dialogue": 118,
+  "max_utterances_per_shot": 0,
+  "median_utterances_per_shot": 0.0,
+  "utterances_crossing_shot_boundaries": 0,
+  "unlinked_utterances": []
+}

@@ -1,0 +1,124 @@
+{
+  "schema_version": "videoops.dataset_manifest.v1",
+  "dataset_id": "videoops_p1_smoke_v1",
+  "scope": {
+    "role": "smoke",
+    "business_task": "query_driven_highlight_localization",
+    "claim_boundary": "protocol and pipeline validation on one open film; not benchmark generalization"
+  },
+  "capacity": {
+    "hard_limit_bytes": 53687091200,
+    "target_limit_bytes": 48318382080,
+    "policy": "final offline package must contain code, data, model and environment without server downloads"
+  },
+  "videos": [
+    {
+      "video_id": "tears_of_steel_s1_20s_500s",
+      "split": "smoke",
+      "duration_ms": 480000,
+      "license": "CC BY 3.0",
+      "artifacts": [
+        {
+          "path": "data/processed/tears_of_steel/s1/sample_20s_500s.mp4",
+          "bytes": 190973299,
+          "sha256": "2D5A982D1F3A98FC0FC01E22960C5ECA14B98AD6681A3F78EF8E61AF9E0F2116"
+        },
+        {
+          "path": "data/processed/tears_of_steel/s1/subtitles_en.srt",
+          "bytes": 4195,
+          "sha256": "9091563572BA8EA6B350487CECC456F5C542D7BA28E7F9D2C84B3D6166AAB286"
+        },
+        {
+          "path": "data/processed/tears_of_steel/s1/shots_ffmpeg_t035/evidence_units.jsonl",
+          "bytes": 33005,
+          "sha256": "5F1ACF584D0E90512E39DE4CEF7F85F4535D3D5A55E36E2AE225741238E3B958"
+        },
+        {
+          "path": "data/processed/tears_of_steel/s1/shots_ffmpeg_t035/utterances.jsonl",
+          "bytes": 9204,
+          "sha256": "7AF67DFC9442448086010336974ED664C799DC55A779B1DDEFFC3CB833814E10"
+        }
+      ],
+      "keyframe_inventory": {
+        "directory": "data/processed/tears_of_steel/s1/shots_ffmpeg_t035/keyframes",
+        "count": 98,
+        "bytes": 8659942,
+        "aggregate_sha256": "4A39E8A97C3B9804DC2BF45DD224F902F0D4E558CF4E2440DA779EA45BE46F39"
+      }
+    }
+  ],
+  "tasks": {
+    "path": "data/registry/p1_smoke_tasks.jsonl",
+    "count": 10,
+    "schema": "schemas/videoops_task_v1.schema.json"
+  },
+  "split_policy": {
+    "unit": "video_id",
+    "production_splits": [
+      "train",
+      "val",
+      "test"
+    ],
+    "rule": "one video_id may appear in exactly one production split",
+    "smoke_excluded_from_metrics": true
+  },
+  "current_inventory": {
+    "bytes": 803739667,
+    "gib": 0.7485,
+    "file_count": 244,
+    "by_top_level": {
+      "data": {
+        "bytes": 766673587,
+        "gib": 0.714
+      },
+      "outputs": {
+        "bytes": 36584387,
+        "gib": 0.0341
+      },
+      "project_root": {
+        "bytes": 231321,
+        "gib": 0.0002
+      },
+      "dist": {
+        "bytes": 90078,
+        "gib": 0.0001
+      },
+      "scripts": {
+        "bytes": 44107,
+        "gib": 0.0
+      },
+      "src": {
+        "bytes": 42126,
+        "gib": 0.0
+      },
+      "docs": {
+        "bytes": 39653,
+        "gib": 0.0
+      },
+      "tests": {
+        "bytes": 16247,
+        "gib": 0.0
+      },
+      "artifacts": {
+        "bytes": 6696,
+        "gib": 0.0
+      },
+      "examples": {
+        "bytes": 5219,
+        "gib": 0.0
+      },
+      "server": {
+        "bytes": 4035,
+        "gib": 0.0
+      },
+      "schemas": {
+        "bytes": 1861,
+        "gib": 0.0
+      },
+      "configs": {
+        "bytes": 350,
+        "gib": 0.0
+      }
+    }
+  }
+}

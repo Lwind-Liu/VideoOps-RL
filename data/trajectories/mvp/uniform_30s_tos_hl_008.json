@@ -1,0 +1,32 @@
+{
+  "task": {
+    "task_id": "tos_hl_008",
+    "query": "Find the failed take where people shout abort, cut, and no.",
+    "search_terms": [
+      "Abort",
+      "Cut",
+      "Nooooo"
+    ],
+    "target_start_ms": 351500,
+    "target_end_ms": 365000,
+    "split": "train"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "uniform_30s_retrieval",
+      "score": 2
+    }
+  ],
+  "result": {
+    "predicted_start_ms": 330000,
+    "predicted_end_ms": 360000,
+    "target_start_ms": 351500,
+    "target_end_ms": 365000,
+    "temporal_iou": 0.24285714285714285,
+    "evidence_supported": false,
+    "audit_passed": false,
+    "success": false,
+    "tool_calls": 1
+  }
+}

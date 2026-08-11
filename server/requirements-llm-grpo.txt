@@ -1,0 +1,12 @@
+trl==1.9.2
+transformers==5.15.0
+accelerate>=1.12.0
+peft>=0.18.0
+Pillow>=11.0.0
+datasets>=4.5.0
+deepspeed>=0.18.0
+vllm>=0.15.0
+safetensors>=0.6.0
+qwen-vl-utils>=0.0.14
+open_clip_torch>=3.2.0
+jmespath>=1.0.1

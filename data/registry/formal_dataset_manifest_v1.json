@@ -1,0 +1,208 @@
+{
+  "schema_version": "videoops.dataset_manifest.v1",
+  "dataset_id": "videoops_formal_v1",
+  "scope": {
+    "role": "pre_server_training",
+    "business_task": "query_driven_highlight_localization",
+    "claim_boundary": "small engineering corpus for end-to-end validation, not benchmark SOTA"
+  },
+  "capacity": {
+    "hard_limit_bytes": 53687091200,
+    "target_limit_bytes": 48318382080,
+    "policy": "fully offline server handoff"
+  },
+  "videos": [
+    {
+      "video_id": "tears_of_steel_train",
+      "split": "train",
+      "duration_ms": 480000,
+      "license": "CC BY 3.0",
+      "source_url": "https://mango.blender.org/",
+      "evidence_root": "data/processed/tears_of_steel/s1/shots_ffmpeg_t035",
+      "artifacts": [
+        {
+          "path": "data/processed/tears_of_steel/s1/sample_20s_500s.mp4",
+          "bytes": 190973299,
+          "sha256": "2D5A982D1F3A98FC0FC01E22960C5ECA14B98AD6681A3F78EF8E61AF9E0F2116"
+        },
+        {
+          "path": "data/processed/tears_of_steel/s1/subtitles_en.srt",
+          "bytes": 4195,
+          "sha256": "9091563572BA8EA6B350487CECC456F5C542D7BA28E7F9D2C84B3D6166AAB286"
+        },
+        {
+          "path": "data/processed/tears_of_steel/s1/shots_ffmpeg_t035/shots.jsonl",
+          "bytes": 18415,
+          "sha256": "002A4E05DCE4F09B2E648A22C2AE61E1D7974B4B0C702982BCCA18DF532E7639"
+        },
+        {
+          "path": "data/processed/tears_of_steel/s1/shots_ffmpeg_t035/utterances.jsonl",
+          "bytes": 9204,
+          "sha256": "7AF67DFC9442448086010336974ED664C799DC55A779B1DDEFFC3CB833814E10"
+        },
+        {
+          "path": "data/processed/tears_of_steel/s1/shots_ffmpeg_t035/evidence_units.jsonl",
+          "bytes": 33005,
+          "sha256": "5F1ACF584D0E90512E39DE4CEF7F85F4535D3D5A55E36E2AE225741238E3B958"
+        }
+      ],
+      "keyframe_inventory": {
+        "count": 98,
+        "bytes": 8659942
+      }
+    },
+    {
+      "video_id": "sintel_val",
+      "split": "val",
+      "duration_ms": 888093,
+      "license": "CC BY 3.0",
+      "source_url": "https://video.blender.org/videos/watch/0eb052d0-fd51-43e6-aa33-ecdbf77a5d40",
+      "evidence_root": "data/processed/sintel/shots_t035",
+      "artifacts": [
+        {
+          "path": "data/raw/sintel/sintel_360p.mp4",
+          "bytes": 83747601,
+          "sha256": "6AC34181D20740D8B04C0DB6E5CA2075D20EEF18A7AE47949D6CB260C21DA2FC"
+        },
+        {
+          "path": "data/raw/sintel/sintel_en.srt",
+          "bytes": 6904,
+          "sha256": "E04D59B13082D0785770A97B066AA648A134111756115F62FE084B7E017D7D1A"
+        },
+        {
+          "path": "data/processed/sintel/shots_t035/shots.jsonl",
+          "bytes": 16918,
+          "sha256": "8216B221C1EBAD510567F3B24B5FDAD18B8623045ED5B3C8C6C81AAA9247A855"
+        },
+        {
+          "path": "data/processed/sintel/shots_t035/utterances.jsonl",
+          "bytes": 15673,
+          "sha256": "0F9B0FAF8548EE6CBF07CB38DCB0D4D31ED763689B571B6334259945D9D5EF1B"
+        },
+        {
+          "path": "data/processed/sintel/shots_t035/evidence_units.jsonl",
+          "bytes": 38935,
+          "sha256": "1B1CADF3D79844A3F40EE7434700531B7F081F5F472F8F6EC99FCE96DB8A4CA5"
+        }
+      ],
+      "keyframe_inventory": {
+        "count": 90,
+        "bytes": 3275257
+      }
+    },
+    {
+      "video_id": "big_buck_bunny_test",
+      "split": "test",
+      "duration_ms": 596566,
+      "license": "CC BY 3.0",
+      "source_url": "https://video.blender.org/videos/watch/bf1f3fb5-b119-4f9f-9930-8e20e892b898",
+      "evidence_root": "data/processed/big_buck_bunny/shots_t035",
+      "artifacts": [
+        {
+          "path": "data/raw/big_buck_bunny/big_buck_bunny_240p.mp4",
+          "bytes": 46651538,
+          "sha256": "6463C3E1C91BE4CF6E2666CBBB2DF73997EE3E02FE8CE0AA00172AF55A0EEA91"
+        },
+        {
+          "path": "data/raw/big_buck_bunny/empty.srt",
+          "bytes": 1,
+          "sha256": "01BA4719C80B6FE911B091A7C05124B64EEECE964E09C058EF8F9805DACA546B"
+        },
+        {
+          "path": "data/processed/big_buck_bunny/shots_t035/shots.jsonl",
+          "bytes": 22265,
+          "sha256": "2408B9537F31181E413D56BDF071DFBFE094E38298F8220DE2F0A207FBB9B323"
+        },
+        {
+          "path": "data/processed/big_buck_bunny/shots_t035/utterances.jsonl",
+          "bytes": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        {
+          "path": "data/processed/big_buck_bunny/shots_t035/evidence_units.jsonl",
+          "bytes": 26381,
+          "sha256": "7AA2B51EBAFB1A589E315077D5FEC67E3DD2AEA2155A51303C2A99F6ABD0D08B"
+        }
+      ],
+      "keyframe_inventory": {
+        "count": 118,
+        "bytes": 2757881
+      }
+    }
+  ],
+  "tasks": {
+    "path": "data/registry/formal_tasks_v1.jsonl",
+    "count": 66,
+    "schema": "schemas/videoops_task_v1.schema.json",
+    "visual_tags": "data/registry/visual_tags_v1.json"
+  },
+  "split_policy": {
+    "unit": "video_id",
+    "production_splits": [
+      "train",
+      "val",
+      "test"
+    ],
+    "rule": "one source film belongs to one split",
+    "smoke_excluded_from_metrics": true
+  },
+  "current_inventory": {
+    "bytes": 1210936816,
+    "gib": 1.1278,
+    "file_count": 473,
+    "by_top_level": {
+      "data": {
+        "bytes": 1173850926,
+        "gib": 1.0932
+      },
+      "outputs": {
+        "bytes": 36584577,
+        "gib": 0.0341
+      },
+      "project_root": {
+        "bytes": 239527,
+        "gib": 0.0002
+      },
+      "dist": {
+        "bytes": 90078,
+        "gib": 0.0001
+      },
+      "scripts": {
+        "bytes": 55521,
+        "gib": 0.0001
+      },
+      "src": {
+        "bytes": 42126,
+        "gib": 0.0
+      },
+      "docs": {
+        "bytes": 39653,
+        "gib": 0.0
+      },
+      "tests": {
+        "bytes": 16247,
+        "gib": 0.0
+      },
+      "artifacts": {
+        "bytes": 6696,
+        "gib": 0.0
+      },
+      "examples": {
+        "bytes": 5219,
+        "gib": 0.0
+      },
+      "server": {
+        "bytes": 4035,
+        "gib": 0.0
+      },
+      "schemas": {
+        "bytes": 1861,
+        "gib": 0.0
+      },
+      "configs": {
+        "bytes": 350,
+        "gib": 0.0
+      }
+    }
+  }
+}

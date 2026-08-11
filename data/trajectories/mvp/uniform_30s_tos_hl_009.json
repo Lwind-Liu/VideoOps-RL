@@ -1,0 +1,32 @@
+{
+  "task": {
+    "task_id": "tos_hl_009",
+    "query": "Find the robot confrontation about a broken heart, being forgotten, and crushing Thom.",
+    "search_terms": [
+      "broke my heart",
+      "forgot me",
+      "crush you"
+    ],
+    "target_start_ms": 363000,
+    "target_end_ms": 373000,
+    "split": "eval"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "uniform_30s_retrieval",
+      "score": 7
+    }
+  ],
+  "result": {
+    "predicted_start_ms": 360000,
+    "predicted_end_ms": 390000,
+    "target_start_ms": 363000,
+    "target_end_ms": 373000,
+    "temporal_iou": 0.3333333333333333,
+    "evidence_supported": false,
+    "audit_passed": false,
+    "success": false,
+    "tool_calls": 1
+  }
+}

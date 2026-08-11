@@ -1,0 +1,32 @@
+{
+  "task": {
+    "task_id": "tos_hl_002",
+    "query": "Find the moment when the robot memory is synchronized and the situation feels freaky.",
+    "search_terms": [
+      "memory synced",
+      "locked",
+      "pretty freaky"
+    ],
+    "target_start_ms": 30000,
+    "target_end_ms": 43000,
+    "split": "train"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "uniform_30s_retrieval",
+      "score": 5
+    }
+  ],
+  "result": {
+    "predicted_start_ms": 30000,
+    "predicted_end_ms": 60000,
+    "target_start_ms": 30000,
+    "target_end_ms": 43000,
+    "temporal_iou": 0.43333333333333335,
+    "evidence_supported": false,
+    "audit_passed": false,
+    "success": false,
+    "tool_calls": 1
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "method": "half_open_interval_overlap",
+  "interval_semantics": "[start_ms, end_ms)",
+  "shots_source": "data/processed/tears_of_steel/s1/shots_ffmpeg_t035/shots.jsonl",
+  "subtitles_source": "data/processed/tears_of_steel/s1/subtitles_en.srt",
+  "language": "en",
+  "shot_count": 98,
+  "utterance_count": 67,
+  "shot_utterance_link_count": 88,
+  "shots_with_dialogue": 55,
+  "shots_without_dialogue": 43,
+  "max_utterances_per_shot": 6,
+  "median_utterances_per_shot": 1.0,
+  "utterances_crossing_shot_boundaries": 20,
+  "unlinked_utterances": []
+}

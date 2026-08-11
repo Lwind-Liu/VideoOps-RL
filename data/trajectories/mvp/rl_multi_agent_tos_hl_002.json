@@ -1,0 +1,205 @@
+{
+  "task": {
+    "task_id": "tos_hl_002",
+    "query": "Find the moment when the robot memory is synchronized and the situation feels freaky.",
+    "search_terms": [
+      "memory synced",
+      "locked",
+      "pretty freaky"
+    ],
+    "target_start_ms": 30000,
+    "target_end_ms": 43000,
+    "split": "train"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "search",
+      "state_before": {
+        "searched": false,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": null,
+        "candidate_end_ms": null,
+        "candidate_shot_ids": [],
+        "confidence": 0.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [],
+        "tool_calls": 0,
+        "done": false
+      },
+      "result": {
+        "hits": 2,
+        "matched_terms": [
+          "locked",
+          "memory synced",
+          "pretty freaky"
+        ]
+      },
+      "reward": -0.05
+    },
+    {
+      "step": 2,
+      "action": "inspect",
+      "state_before": {
+        "searched": true,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 28000,
+        "candidate_end_ms": 45000,
+        "candidate_shot_ids": [
+          "shot_0005",
+          "shot_0006",
+          "shot_0007",
+          "shot_0008",
+          "shot_0009",
+          "shot_0010"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [
+          "Robot's memory synced and locked!",
+          "This is pretty freaky."
+        ],
+        "tool_calls": 1,
+        "done": false
+      },
+      "result": {
+        "shot_id": "shot_0008",
+        "keyframe_path": "keyframes/shot_0008.jpg",
+        "visual_tags": [
+          "scientist",
+          "control interface",
+          "laboratory"
+        ]
+      },
+      "reward": 0.0
+    },
+    {
+      "step": 3,
+      "action": "audit",
+      "state_before": {
+        "searched": true,
+        "inspected": true,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 28000,
+        "candidate_end_ms": 45000,
+        "candidate_shot_ids": [
+          "shot_0005",
+          "shot_0006",
+          "shot_0007",
+          "shot_0008",
+          "shot_0009",
+          "shot_0010"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": "shot_0008",
+        "inspected_keyframe": "keyframes/shot_0008.jpg",
+        "visual_tags": [
+          "scientist",
+          "control interface",
+          "laboratory"
+        ],
+        "transcript_evidence": [
+          "Robot's memory synced and locked!",
+          "This is pretty freaky."
+        ],
+        "tool_calls": 2,
+        "done": false
+      },
+      "result": {
+        "agent": "EvidenceAuditor",
+        "passed": true,
+        "transcript_ok": true,
+        "keyframe_ok": true
+      },
+      "reward": 0.05
+    },
+    {
+      "step": 4,
+      "action": "submit",
+      "state_before": {
+        "searched": true,
+        "inspected": true,
+        "expanded": false,
+        "audited": true,
+        "audit_passed": true,
+        "candidate_start_ms": 28000,
+        "candidate_end_ms": 45000,
+        "candidate_shot_ids": [
+          "shot_0005",
+          "shot_0006",
+          "shot_0007",
+          "shot_0008",
+          "shot_0009",
+          "shot_0010"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": "shot_0008",
+        "inspected_keyframe": "keyframes/shot_0008.jpg",
+        "visual_tags": [
+          "scientist",
+          "control interface",
+          "laboratory"
+        ],
+        "transcript_evidence": [
+          "Robot's memory synced and locked!",
+          "This is pretty freaky."
+        ],
+        "tool_calls": 3,
+        "done": false
+      },
+      "result": {
+        "task_reward": 2.229411764705882,
+        "predicted_start_ms": 28000,
+        "predicted_end_ms": 45000,
+        "target_start_ms": 30000,
+        "target_end_ms": 43000,
+        "temporal_iou": 0.7647058823529411,
+        "evidence_supported": true,
+        "audit_passed": true,
+        "success": true,
+        "evidence_shot_ids": [
+          "shot_0005",
+          "shot_0006",
+          "shot_0007",
+          "shot_0008",
+          "shot_0009",
+          "shot_0010"
+        ],
+        "keyframe_path": "keyframes/shot_0008.jpg"
+      },
+      "reward": 2.229411764705882
+    }
+  ],
+  "result": {
+    "task_reward": 2.229411764705882,
+    "predicted_start_ms": 28000,
+    "predicted_end_ms": 45000,
+    "target_start_ms": 30000,
+    "target_end_ms": 43000,
+    "temporal_iou": 0.7647058823529411,
+    "evidence_supported": true,
+    "audit_passed": true,
+    "success": true,
+    "evidence_shot_ids": [
+      "shot_0005",
+      "shot_0006",
+      "shot_0007",
+      "shot_0008",
+      "shot_0009",
+      "shot_0010"
+    ],
+    "keyframe_path": "keyframes/shot_0008.jpg"
+  }
+}

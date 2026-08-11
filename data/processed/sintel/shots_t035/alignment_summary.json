@@ -1,0 +1,18 @@
+{
+  "method": "half_open_interval_overlap",
+  "interval_semantics": "[start_ms, end_ms)",
+  "shots_source": "data/processed/sintel/shots_t035/shots.jsonl",
+  "subtitles_source": "data/raw/sintel/sintel_en.srt",
+  "language": "en",
+  "shot_count": 90,
+  "utterance_count": 111,
+  "shot_utterance_link_count": 146,
+  "shots_with_dialogue": 62,
+  "shots_without_dialogue": 28,
+  "max_utterances_per_shot": 30,
+  "median_utterances_per_shot": 1.0,
+  "utterances_crossing_shot_boundaries": 24,
+  "unlinked_utterances": [
+    "utt_0006"
+  ]
+}

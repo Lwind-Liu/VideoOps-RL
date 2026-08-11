@@ -1,0 +1,47 @@
+schema_version: videoops.algorithm.v2
+retrieval:
+  clip_score_floor: 0.15
+  clip_score_range: 0.20
+  visual_clip_weight: 0.65
+  visual_metadata_weight: 0.35
+  fusion_weights:
+    text: 0.52
+    image: 0.38
+    context: 0.10
+  candidate_limit: 10
+graph:
+  context_decay: 0.70
+audit:
+  semantic_weight: 0.55
+  modality_weight: 0.25
+  continuity_weight: 0.20
+  pass_threshold: 0.42
+process_reward:
+  reciprocal_rank_gain: 0.18
+  inspect_correct: 0.12
+  inspect_wrong: -0.02
+  context_recall_gain: 0.12
+  correct_audit: 0.08
+  false_positive_audit: -0.06
+  invalid_action: -0.08
+  invalid_submission: -0.10
+terminal_reward:
+  temporal_iou: 2.00
+  shot_f1: 0.35
+  semantic_audit: 0.30
+  modality_coverage: 0.20
+  tool_cost: 0.025
+  repeated_call_cost: 0.06
+  invalid_call_cost: 0.20
+training:
+  formal_sampling_ratio: 0.20
+  qvhighlights_sampling_ratio: 0.80
+  formal_sft_oversample: 5
+  rollouts_per_prompt: 4
+  max_tool_steps: 10
+qvhighlights:
+  clip_seconds: 2
+  candidate_limit: 12
+  feature_score_floor: 0.10
+  feature_score_range: 0.25
+  saliency_reward_weight: 0.10

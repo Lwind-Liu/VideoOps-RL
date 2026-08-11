@@ -1,0 +1,17 @@
+{
+  "method": "ffmpeg_scene_score",
+  "input": "data/raw/big_buck_bunny/big_buck_bunny_240p.mp4",
+  "threshold": 0.35,
+  "duration_s": 596.566,
+  "fps": 24.0,
+  "transition_count": 117,
+  "shot_count": 118,
+  "shot_duration_s": {
+    "min": 0.25,
+    "median": 2.7083335,
+    "mean": 5.05564406779661,
+    "max": 110.274333
+  },
+  "boundary_semantics": "transition timestamp is the first frame of the new shot",
+  "keyframe_policy": "temporal midpoint of each shot"
+}

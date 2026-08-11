@@ -1,0 +1,31 @@
+{
+  "task": {
+    "task_id": "tos_hl_003",
+    "query": "Find the conversation where someone says they heard the others talking and says it is not their fault.",
+    "search_terms": [
+      "heard you guys talking",
+      "not my fault"
+    ],
+    "target_start_ms": 111000,
+    "target_end_ms": 118000,
+    "split": "eval"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "uniform_30s_retrieval",
+      "score": 7
+    }
+  ],
+  "result": {
+    "predicted_start_ms": 90000,
+    "predicted_end_ms": 120000,
+    "target_start_ms": 111000,
+    "target_end_ms": 118000,
+    "temporal_iou": 0.23333333333333334,
+    "evidence_supported": false,
+    "audit_passed": false,
+    "success": false,
+    "tool_calls": 1
+  }
+}

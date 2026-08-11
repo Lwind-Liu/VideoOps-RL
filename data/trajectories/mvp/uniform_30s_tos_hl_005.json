@@ -1,0 +1,32 @@
+{
+  "task": {
+    "task_id": "tos_hl_005",
+    "query": "Find the action cue and the start of the memory overwrite.",
+    "search_terms": [
+      "and action",
+      "memory overwrite in progress",
+      "jerk Thom"
+    ],
+    "target_start_ms": 272000,
+    "target_end_ms": 281000,
+    "split": "train"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "uniform_30s_retrieval",
+      "score": 8
+    }
+  ],
+  "result": {
+    "predicted_start_ms": 270000,
+    "predicted_end_ms": 300000,
+    "target_start_ms": 272000,
+    "target_end_ms": 281000,
+    "temporal_iou": 0.3,
+    "evidence_supported": false,
+    "audit_passed": false,
+    "success": false,
+    "tool_calls": 1
+  }
+}

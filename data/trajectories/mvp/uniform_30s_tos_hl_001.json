@@ -1,0 +1,33 @@
+{
+  "task": {
+    "task_id": "tos_hl_001",
+    "query": "Find the opening argument about the robot hand and robotic-claw nightmare.",
+    "search_terms": [
+      "robot hand",
+      "freaked out",
+      "nightmares",
+      "robotic claws"
+    ],
+    "target_start_ms": 10800,
+    "target_end_ms": 25000,
+    "split": "train"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "uniform_30s_retrieval",
+      "score": 7
+    }
+  ],
+  "result": {
+    "predicted_start_ms": 0,
+    "predicted_end_ms": 30000,
+    "target_start_ms": 10800,
+    "target_end_ms": 25000,
+    "temporal_iou": 0.47333333333333333,
+    "evidence_supported": false,
+    "audit_passed": false,
+    "success": false,
+    "tool_calls": 1
+  }
+}

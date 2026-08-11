@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "videoops.dataset_manifest.v1",
+  "title": "VideoOps-RL offline dataset manifest",
+  "type": "object",
+  "required": ["schema_version", "dataset_id", "scope", "capacity", "videos", "tasks", "split_policy"],
+  "properties": {
+    "schema_version": {"const": "videoops.dataset_manifest.v1"},
+    "dataset_id": {"type": "string", "minLength": 1},
+    "scope": {"type": "object"},
+    "capacity": {"type": "object"},
+    "videos": {"type": "array", "minItems": 1},
+    "tasks": {"type": "object"},
+    "split_policy": {"type": "object"}
+  }
+}

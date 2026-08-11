@@ -1,0 +1,32 @@
+{
+  "task": {
+    "task_id": "tos_hl_004",
+    "query": "Find the production countdown when all systems are ready and everyone is told to go.",
+    "search_terms": [
+      "all systems go",
+      "go go go",
+      "I love it"
+    ],
+    "target_start_ms": 183500,
+    "target_end_ms": 197000,
+    "split": "train"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "uniform_30s_retrieval",
+      "score": 9
+    }
+  ],
+  "result": {
+    "predicted_start_ms": 180000,
+    "predicted_end_ms": 210000,
+    "target_start_ms": 183500,
+    "target_end_ms": 197000,
+    "temporal_iou": 0.45,
+    "evidence_supported": false,
+    "audit_passed": false,
+    "success": false,
+    "tool_calls": 1
+  }
+}

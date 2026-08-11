@@ -1,0 +1,32 @@
+{
+  "task": {
+    "task_id": "tos_hl_007",
+    "query": "Find the warning that only two minutes remain and Thom must speed up.",
+    "search_terms": [
+      "two minutes left",
+      "speed it up",
+      "Vivacissimo"
+    ],
+    "target_start_ms": 319000,
+    "target_end_ms": 330000,
+    "split": "train"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "uniform_30s_retrieval",
+      "score": 7
+    }
+  ],
+  "result": {
+    "predicted_start_ms": 300000,
+    "predicted_end_ms": 330000,
+    "target_start_ms": 319000,
+    "target_end_ms": 330000,
+    "temporal_iou": 0.36666666666666664,
+    "evidence_supported": false,
+    "audit_passed": false,
+    "success": false,
+    "tool_calls": 1
+  }
+}

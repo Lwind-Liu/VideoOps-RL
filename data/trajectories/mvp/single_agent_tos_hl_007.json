@@ -1,0 +1,151 @@
+{
+  "task": {
+    "task_id": "tos_hl_007",
+    "query": "Find the warning that only two minutes remain and Thom must speed up.",
+    "search_terms": [
+      "two minutes left",
+      "speed it up",
+      "Vivacissimo"
+    ],
+    "target_start_ms": 319000,
+    "target_end_ms": 330000,
+    "split": "train"
+  },
+  "trajectory": [
+    {
+      "step": 1,
+      "action": "search",
+      "state_before": {
+        "searched": false,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": null,
+        "candidate_end_ms": null,
+        "candidate_shot_ids": [],
+        "confidence": 0.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [],
+        "tool_calls": 0,
+        "done": false
+      },
+      "result": {
+        "hits": 3,
+        "matched_terms": [
+          "Vivacissimo",
+          "speed it up",
+          "two minutes left"
+        ]
+      },
+      "reward": -0.05
+    },
+    {
+      "step": 2,
+      "action": "inspect",
+      "state_before": {
+        "searched": true,
+        "inspected": false,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 317000,
+        "candidate_end_ms": 328000,
+        "candidate_shot_ids": [
+          "shot_0052",
+          "shot_0053",
+          "shot_0054"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": null,
+        "inspected_keyframe": null,
+        "visual_tags": [],
+        "transcript_evidence": [
+          "Okay, they're coming. Two minutes left!",
+          "Speed it up, Thom!",
+          "Vivacissimo!"
+        ],
+        "tool_calls": 1,
+        "done": false
+      },
+      "result": {
+        "shot_id": "shot_0053",
+        "keyframe_path": "keyframes/shot_0053.jpg",
+        "visual_tags": [
+          "countdown",
+          "laboratory crew"
+        ]
+      },
+      "reward": 0.0
+    },
+    {
+      "step": 3,
+      "action": "submit",
+      "state_before": {
+        "searched": true,
+        "inspected": true,
+        "expanded": false,
+        "audited": false,
+        "audit_passed": false,
+        "candidate_start_ms": 317000,
+        "candidate_end_ms": 328000,
+        "candidate_shot_ids": [
+          "shot_0052",
+          "shot_0053",
+          "shot_0054"
+        ],
+        "confidence": 1.0,
+        "inspected_shot_id": "shot_0053",
+        "inspected_keyframe": "keyframes/shot_0053.jpg",
+        "visual_tags": [
+          "countdown",
+          "laboratory crew"
+        ],
+        "transcript_evidence": [
+          "Okay, they're coming. Two minutes left!",
+          "Speed it up, Thom!",
+          "Vivacissimo!"
+        ],
+        "tool_calls": 2,
+        "done": false
+      },
+      "result": {
+        "task_reward": 1.7846153846153845,
+        "predicted_start_ms": 317000,
+        "predicted_end_ms": 328000,
+        "target_start_ms": 319000,
+        "target_end_ms": 330000,
+        "temporal_iou": 0.6923076923076923,
+        "evidence_supported": true,
+        "audit_passed": false,
+        "success": true,
+        "evidence_shot_ids": [
+          "shot_0052",
+          "shot_0053",
+          "shot_0054"
+        ],
+        "keyframe_path": "keyframes/shot_0053.jpg"
+      },
+      "reward": 1.7846153846153845
+    }
+  ],
+  "result": {
+    "task_reward": 1.7846153846153845,
+    "predicted_start_ms": 317000,
+    "predicted_end_ms": 328000,
+    "target_start_ms": 319000,
+    "target_end_ms": 330000,
+    "temporal_iou": 0.6923076923076923,
+    "evidence_supported": true,
+    "audit_passed": false,
+    "success": true,
+    "evidence_shot_ids": [
+      "shot_0052",
+      "shot_0053",
+      "shot_0054"
+    ],
+    "keyframe_path": "keyframes/shot_0053.jpg"
+  }
+}

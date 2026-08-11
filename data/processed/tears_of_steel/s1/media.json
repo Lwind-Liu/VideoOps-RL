@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "media_id": "tears_of_steel_s1_20s_500s",
+  "parent_media_id": "tears_of_steel_2012",
+  "timeline": {
+    "start_ms": 0,
+    "end_ms": 480000,
+    "duration_ms": 480000
+  },
+  "artifacts": {
+    "sample": {
+      "path": "data/processed/tears_of_steel/s1/sample_20s_500s.mp4",
+      "bytes": 190973299,
+      "sha256": "2D5A982D1F3A98FC0FC01E22960C5ECA14B98AD6681A3F78EF8E61AF9E0F2116"
+    },
+    "video": {
+      "path": "data/processed/tears_of_steel/s1/video_only.mp4",
+      "bytes": 179055390,
+      "sha256": "951BE5461AA17A1BEA47E48654EF09518CC6793A1224EA5CCD55DE698B61E6C1"
+    },
+    "audio_asr": {
+      "path": "data/processed/tears_of_steel/s1/audio_asr_16k_mono.wav",
+      "bytes": 15360078,
+      "sha256": "8074F25FCFC0AF939EACAB7DADFE2F20E818CF4E9AEFE8DB53378E2435E95623"
+    },
+    "subtitles": {
+      "path": "data/processed/tears_of_steel/s1/subtitles_en.srt",
+      "bytes": 4195,
+      "sha256": "9091563572BA8EA6B350487CECC456F5C542D7BA28E7F9D2C84B3D6166AAB286"
+    }
+  },
+  "indexes": {
+    "shots": "data/processed/tears_of_steel/s1/shots_ffmpeg_t035/shots.jsonl",
+    "utterances": "data/processed/tears_of_steel/s1/shots_ffmpeg_t035/utterances.jsonl",
+    "evidence_units": "data/processed/tears_of_steel/s1/shots_ffmpeg_t035/evidence_units.jsonl",
+    "keyframe_dir": "data/processed/tears_of_steel/s1/shots_ffmpeg_t035/keyframes"
+  },
+  "counts": {
+    "shots": 98,
+    "utterances": 67,
+    "evidence_units": 98,
+    "keyframes": 98
+  },
+  "processing": {
+    "shot_detector": "ffmpeg_scene_score",
+    "shot_threshold": 0.35,
+    "keyframe_policy": "temporal midpoint of each shot",
+    "alignment": "half_open_interval_overlap"
+  },
+  "keyframes_sha256_aggregate": "4A39E8A97C3B9804DC2BF45DD224F902F0D4E558CF4E2440DA779EA45BE46F39",
+  "source_manifest": "data/manifests/tears_of_steel_s1.json"
+}
