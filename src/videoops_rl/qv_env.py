@@ -13,6 +13,7 @@ import yaml
 from .evidence_graph import TemporalEvidenceGraph
 from .multivideo_env import EpisodeState, MultiVideoHighlightEnv
 from .retrieval import clip_encoder, load_qv_query_index
+from .training_data_quality import validate_feature_matrix
 
 
 @dataclass(frozen=True)
@@ -84,7 +85,9 @@ class QVHighlightsEnv(MultiVideoHighlightEnv):
         feature_path = self.repo_root / "data/external/qvhighlights/features/clip_features" / f"{task['qv_vid']}.npz"
         if not feature_path.is_file():
             raise FileNotFoundError(f"QVHighlights feature missing: {feature_path}")
-        features = np.load(feature_path)["features"].astype(np.float32)
+        features = np.load(feature_path, allow_pickle=False)["features"]
+        validate_feature_matrix(features, feature_path.as_posix())
+        features = features.astype(np.float32)
         features /= np.maximum(np.linalg.norm(features, axis=1, keepdims=True), 1e-8)
         self.features = features
         clip_ms = int(self.config["qvhighlights"]["clip_seconds"] * 1000)

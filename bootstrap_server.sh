@@ -108,6 +108,8 @@ for PATH_TO_OVERLAY in configs schemas scripts server src tests pyproject.toml R
     cp -a "$PATH_TO_OVERLAY" "$PROJECT_DIR/"
   fi
 done
+mkdir -p "$PROJECT_DIR/data"
+cp -a data/training "$PROJECT_DIR/data/"
 
 cd "$PROJECT_DIR"
 

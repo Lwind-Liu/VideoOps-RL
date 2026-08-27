@@ -9,4 +9,5 @@ safetensors==0.8.0
 qwen-vl-utils==0.0.14
 open_clip_torch==3.3.0
 jmespath==1.1.0
+jsonschema==4.25.1
 PyYAML==6.0.3

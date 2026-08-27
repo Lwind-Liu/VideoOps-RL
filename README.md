@@ -93,6 +93,7 @@ VideoOps-RL 运行结果
 - [Algorithm v2 详解](docs/ALGORITHM_V2_GUIDE.md)
 - [完整全链路教程](docs/FULL_PIPELINE_TUTORIAL.md)
 - [离线训练包 Release](https://github.com/Lwind-Liu/VideoOps-RL/releases/tag/offline-v2.0.0)
+- [训练数据质量审计](data/training/training_data_audit_v2.json)
 
 服务器没有权重、希望先从本地上传时，先在 Windows 运行：
 

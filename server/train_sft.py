@@ -129,7 +129,7 @@ def main() -> None:
         output_dir=args.output_dir, num_train_epochs=args.epochs, learning_rate=2e-5,
         per_device_train_batch_size=1, gradient_accumulation_steps=args.gradient_accumulation_steps, bf16=True,
         gradient_checkpointing=True, logging_steps=1, save_strategy="epoch",
-        eval_strategy="epoch", report_to="none", max_length=None,
+        eval_strategy="epoch", report_to="none", max_length=None, assistant_only_loss=True,
     )
     peft = LoraConfig(r=16, lora_alpha=32, lora_dropout=0.05, target_modules="all-linear", task_type="CAUSAL_LM")
     processor = AutoProcessor.from_pretrained(args.model, local_files_only=True)

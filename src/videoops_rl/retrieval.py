@@ -11,6 +11,8 @@ from typing import Any
 
 import numpy as np
 
+from .training_data_quality import validate_feature_matrix
+
 
 def tokens(text: str) -> list[str]:
     return [token for token in re.findall(r"[a-z0-9']+", text.lower()) if token not in {"a", "an", "and", "at", "by", "find", "in", "is", "it", "of", "on", "scene", "the", "to", "when", "where", "with"}]
@@ -62,8 +64,13 @@ def clip_encoder(repo_root: str) -> CLIPTextEncoder:
 
 
 def load_clip_index(repo_root: Path, video_id: str) -> tuple[list[str], np.ndarray]:
-    data = np.load(repo_root / "data/indexes/clip_vit_b32" / f"{video_id}.npz")
-    return data["shot_ids"].tolist(), data["embeddings"].astype(np.float32)
+    path = repo_root / "data/indexes/clip_vit_b32" / f"{video_id}.npz"
+    data = np.load(path, allow_pickle=False)
+    shot_ids, embeddings = data["shot_ids"].tolist(), data["embeddings"]
+    validate_feature_matrix(embeddings, path.as_posix())
+    if len(shot_ids) != len(embeddings) or len(shot_ids) != len(set(shot_ids)):
+        raise ValueError(f"invalid shot ID index in {path}")
+    return shot_ids, embeddings.astype(np.float32)
 
 
 @lru_cache(maxsize=1)
@@ -71,5 +78,9 @@ def load_qv_query_index(repo_root: str) -> dict[str, np.ndarray]:
     path = Path(repo_root) / "data/external/qvhighlights/query_embeddings_vit_b32.npz"
     if not path.is_file():
         return {}
-    data = np.load(path)
-    return {str(task_id): vector.astype(np.float32) for task_id, vector in zip(data["task_ids"], data["embeddings"])}
+    data = np.load(path, allow_pickle=False)
+    task_ids, embeddings = data["task_ids"].tolist(), data["embeddings"]
+    validate_feature_matrix(embeddings, path.as_posix())
+    if len(task_ids) != len(embeddings) or len(task_ids) != len(set(task_ids)):
+        raise ValueError(f"invalid task ID index in {path}")
+    return {str(task_id): vector.astype(np.float32) for task_id, vector in zip(task_ids, embeddings)}

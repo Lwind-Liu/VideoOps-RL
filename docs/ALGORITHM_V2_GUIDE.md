@@ -126,7 +126,7 @@ GRPO train 有 9,018 条无标签泄漏采样记录，其中 7,218 条 QVHighlig
 
 ## 8. 你应该怎样理解结果边界
 
-已经确认：10,310 个公开任务和特征完整；无视频级 split 泄漏；3,092 个 val/test 任务全部完成算法评测；自适应 proposal 显著优于两个窗口基线；3,575 条成功 SFT 轨迹和 9,018 条 GRPO train 采样记录已生成；43 个本地测试通过。
+已经确认：10,310 个公开任务和特征完整；无视频级 split 泄漏；3,092 个 val/test 任务全部完成算法评测；自适应 proposal 显著优于两个窗口基线；3,575 条成功 SFT 轨迹和 9,018 条 GRPO train 采样记录已生成。SFT 只对 assistant 工具调用计算 loss，终局 IoU/reward 不进入训练消息；最新机器可读审计见 `data/training/training_data_audit_v2.json`。
 
 尚未确认：SFT checkpoint 的工具合法率、GRPO 的组内 reward 方差、训练后相对 SFT 的增益、8 张 H200 的真实吞吐和峰值显存。这些必须以服务器日志和 checkpoint 报告为准。
 

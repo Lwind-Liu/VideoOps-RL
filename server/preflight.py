@@ -27,6 +27,7 @@ def main() -> None:
         "data/training/sft_train_v2.jsonl",
         "data/training/sft_val_v2.jsonl",
         "data/training/grpo_train_v2.jsonl",
+        "data/training/training_data_audit_v2.json",
         "data/registry/formal_tasks_v1.jsonl",
         "data/external/qvhighlights/annotations/tasks_train_v1.jsonl",
         "data/external/qvhighlights/annotations/tasks_val_v1.jsonl",
@@ -47,12 +48,18 @@ def main() -> None:
         "free_gib": round(shutil.disk_usage(ROOT).free / 1024**3, 2),
     }
     try:
+        training_audit = json.loads((ROOT / "data/training/training_data_audit_v2.json").read_text(encoding="utf-8"))
+        checks["training_data_audit_passed"] = training_audit.get("passed") is True
+        checks["training_data_counts"] = training_audit.get("counts", {})
+    except Exception as error:
+        checks["training_data_audit_error"] = repr(error)
+    try:
         import torch
         checks.update({"torch": torch.__version__, "cuda": torch.cuda.is_available(), "gpu_count": torch.cuda.device_count(), "gpus": [torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())]})
     except Exception as error:
         checks["torch_error"] = repr(error)
     try:
-        from trl import GRPOConfig, GRPOTrainer
+        from trl import GRPOConfig, GRPOTrainer, SFTConfig
         checks["trl"] = importlib.metadata.version("trl")
         checks["transformers"] = importlib.metadata.version("transformers")
         checks["vllm"] = importlib.metadata.version("vllm")
@@ -65,6 +72,8 @@ def main() -> None:
         )
         checks["trl_environment_factory"] = "environment_factory" in inspect.signature(GRPOTrainer.__init__).parameters
         grpo_config_fields = inspect.signature(GRPOConfig.__init__).parameters
+        sft_config_fields = inspect.signature(SFTConfig.__init__).parameters
+        checks["trl_assistant_only_loss"] = "assistant_only_loss" in sft_config_fields
         checks["trl_vllm_server_config"] = all(
             name in grpo_config_fields
             for name in ("use_vllm", "vllm_mode", "vllm_server_host", "vllm_server_port")
@@ -76,6 +85,11 @@ def main() -> None:
         checks["jmespath"] = jmespath.__version__
     except Exception as error:
         checks["jmespath_error"] = repr(error)
+    try:
+        import jsonschema
+        checks["jsonschema"] = importlib.metadata.version("jsonschema")
+    except Exception as error:
+        checks["jsonschema_error"] = repr(error)
     try:
         from transformers import AutoProcessor
         processor = AutoProcessor.from_pretrained(ROOT / "models/Qwen3-VL-2B-Instruct", local_files_only=True)
@@ -107,13 +121,16 @@ def main() -> None:
         and checks["qv_feature_files"] >= 10_000
         and checks["qv_query_index"]
         and all(checks["required_data"].values())
+        and checks.get("training_data_audit_passed", False)
         and all(checks["commands"].values())
         and checks.get("cuda", False)
         and checks.get("gpu_count", 0) >= args.required_gpus
         and checks.get("versions_supported", False)
         and checks.get("trl_environment_factory", False)
         and checks.get("trl_vllm_server_config", False)
+        and checks.get("trl_assistant_only_loss", False)
         and "jmespath" in checks
+        and checks.get("jsonschema") == "4.25.1"
         and checks.get("tool_chat_template", False)
         and checks.get("tool_gateway", False)
         and checks.get("training_signal_analyzer", False)

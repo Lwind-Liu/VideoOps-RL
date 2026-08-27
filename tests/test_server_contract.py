@@ -31,13 +31,16 @@ def test_bootstrap_and_dependency_contract_is_pinned():
     collector = (ROOT / "server/collect_run_bundle.sh").read_text(encoding="utf-8")
     analyzer = (ROOT / "server/analyze_training_run.py").read_text(encoding="utf-8")
     gateway = (ROOT / "src/videoops_rl/tool_gateway.py").read_text(encoding="utf-8")
+    sft_trainer = (ROOT / "server/train_sft.py").read_text(encoding="utf-8")
     assert "trl[vllm,peft,vlm]==1.9.2" in requirements
     assert "vllm==0.25.1" in requirements
+    assert "jsonschema==4.25.1" in requirements
     assert "deepspeed==0.19.5" in bootstrap
     assert 'RUN_MODE=${RUN_MODE:-auto}' in bootstrap
     assert 'run_pipeline smoke' in bootstrap
     assert 'run_pipeline full' in bootstrap
     assert 'cp -a "$PATH_TO_OVERLAY" "$PROJECT_DIR/"' in bootstrap
+    assert 'cp -a data/training "$PROJECT_DIR/data/"' in bootstrap
     assert 'bootstrap.log' in bootstrap
     assert "cd /root/code && bash bootstrap_server.sh" in readme
     assert "下面两种情况二选一，不要依次执行" in readme
@@ -45,3 +48,4 @@ def test_bootstrap_and_dependency_contract_is_pinned():
     assert "checkpoint_sha256.txt" in collector
     assert "approximate_zero_advantage_group_rate" in analyzer
     assert "request_id" in gateway and "state_before" in gateway and "cost_units" in gateway
+    assert "assistant_only_loss=True" in sft_trainer

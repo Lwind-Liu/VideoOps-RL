@@ -85,17 +85,18 @@ R = 2.0 * temporal_IoU
 
 时间 IoU 是预测区间和目标区间的交并比。只奖励 IoU，模型可能碰巧猜中却不给证据；只奖励审计，模型可能机械调用所有工具；加入工具成本，才会学习“证据足够时停止”。当前权重是工程初值，不声称理论最优。服务器训练时应先观察各分量尺度，再决定是否调权重。
 
-这是环境 reward，不是把标签塞进 prompt。环境内部可以持有 ground truth 来评分，模型观测中不能出现。`scripts/build_training_data.py` 对所有 GRPO prompt 做了关键词泄漏检查。
+这是环境 reward，不是把标签塞进 prompt。环境内部可以持有 ground truth 来评分，模型观测中不能出现。`scripts/build_training_data.py` 对 GRPO prompt 做结构化公开字段校验，并检查任务 schema、时间边界、工具参数、CLIP 特征数值和重复策略。
 
 ## 7. SFT 和 GRPO 数据怎样生成
 
-规则多智能体先充当 teacher，运行每个任务并保存完整工具轨迹。SFT 数据包含 system/user/assistant/tool 多轮消息，让模型先学会合法 JSON、工具参数和基本顺序。GRPO 文件只包含公开 prompt；训练时每次由环境随机抽 train task，模型自己调用工具，结束后环境计算 reward。
+规则多智能体先充当 teacher，运行每个任务并保存工具轨迹。只有 IoU、证据接地和审计同时通过的轨迹进入 SFT；训练只对 assistant 工具调用计算 loss，`submit` 后的隐藏评分不会写入 messages。GRPO 文件只包含公开 prompt；训练时同一 `task_id` 组成 4 条 rollout，模型自己调用工具，结束后环境计算 reward。
 
 文件位于 `data/training/`：
 
-- `sft_train_v1.jsonl`：40 条 teacher 轨迹；
-- `sft_val_v1.jsonl`：15 条流程验证数据；
-- `grpo_train_v1.jsonl`：40 条无标签 prompt；
+- `sft_train_v2.jsonl`：3,575 条成功 teacher 轨迹，其中开放影片成功轨迹重复 5 次；
+- `sft_val_v2.jsonl`：776 条验证轨迹；
+- `grpo_train_v2.jsonl`：9,018 条公开 prompt，包含 7,218 条 QVHighlights 和 1,800 条开放影片 episode；
+- `training_data_audit_v2.json`：构建计数、成功率、重复策略和泄漏检查；
 - test 文件只用于最终评测，不被训练入口读取。
 
 SFT 的作用是“先学会怎么行动”，GRPO 的作用是“在多条合法行动轨迹里，更偏好效果高、证据足、调用少的那条”。直接跳过 SFT 做 GRPO，早期 completion 往往连工具 JSON 都不合法，奖励大多相同，训练信号很差。

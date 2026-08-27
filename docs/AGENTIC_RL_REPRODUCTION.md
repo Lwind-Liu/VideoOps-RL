@@ -147,6 +147,8 @@ SFT 不负责让模型记住高光答案，主要训练三件事：
 
 Teacher 是无标签泄漏的规则多 Agent。只有成功且通过审计的轨迹进入主 SFT 集；正式影片轨迹适度过采样，以保证模型见过真实图像工具结果。数据按视频级拆分，避免同一影片的画风、人物和台词同时进入 train/test。
 
+训练启用 `assistant_only_loss`，只监督 Coordinator 生成的工具调用；`submit` 后的隐藏 IoU、reward 和分项评分不写入 SFT messages。任务结构、工具参数、时间边界、CLIP 数值、重复比例和 GRPO 公开字段由 `training_data_quality.py` 校验，审计结果固化在 `data/training/training_data_audit_v2.json`。
+
 SFT 需要观察：
 
 - train/eval loss；

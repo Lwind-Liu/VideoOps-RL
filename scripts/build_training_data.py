@@ -4,15 +4,24 @@ from __future__ import annotations
 
 import json
 import sys
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT))
 
 from videoops_rl.agents import multi_agent_expert
 from videoops_rl.dataset_protocol import read_jsonl
 from videoops_rl.multivideo_env import MultiVideoHighlightEnv
 from videoops_rl.qv_env import QVHighlightsEnv
+from videoops_rl.training_data_quality import (
+    duplication_summary,
+    validate_grpo_record,
+    validate_sft_record,
+    validate_tasks,
+)
+from server.tool_schemas import TOOL_SCHEMAS
 
 SYSTEM = """You are the Coordinator in VideoOps-RL. Locate query-relevant highlights by calling tools. TimelineScout handles transcript search, VisionAnalyst handles visual search and keyframe inspection, and EvidenceAuditor checks grounding. Never invent a shot ID. Return the final selection through submit."""
 
@@ -32,6 +41,10 @@ def build_record(task: dict, env_class=MultiVideoHighlightEnv) -> tuple[dict, di
     image_paths = []
     for step in env.trajectory:
         messages.append(_assistant_call(step["tool"], step["arguments"]))
+        # submit terminates the episode. Its hidden IoU/reward is metadata for
+        # filtering, not text that the policy should imitate.
+        if step["tool"] == "submit":
+            continue
         content = _text_content(json.dumps(step["observation"], ensure_ascii=False))
         path = step["observation"].get("keyframe_path")
         if path:
@@ -48,6 +61,13 @@ def main() -> None:
     formal_tasks = read_jsonl(ROOT / "data/registry/formal_tasks_v1.jsonl")
     qv_root = ROOT / "data/external/qvhighlights/annotations"
     qv_tasks = [item for split in ("train", "val", "test") for item in read_jsonl(qv_root / f"tasks_{split}_v1.jsonl")]
+    formal_manifest = json.loads((ROOT / "data/registry/formal_dataset_manifest_v1.json").read_text(encoding="utf-8"))
+    durations = {video["video_id"]: int(video["duration_ms"]) for video in formal_manifest["videos"]}
+    task_split_counts = validate_tasks(
+        formal_tasks + qv_tasks,
+        ROOT / "schemas/videoops_task_v1.schema.json",
+        durations,
+    )
     output = ROOT / "data/training"
     output.mkdir(parents=True, exist_ok=True)
     formal_records = [(*build_record(task), task) for task in formal_tasks]
@@ -67,6 +87,10 @@ def main() -> None:
         formal_prompts = [prompt for _, prompt, task in formal_records if task["split"] == split]
         grpo_formal_repeat = 45 if split == "train" else 1
         prompts = qv_prompts + formal_prompts * grpo_formal_repeat
+        for record in sft:
+            validate_sft_record(record, TOOL_SCHEMAS)
+        for record in prompts:
+            validate_grpo_record(record)
         for name, values in ((f"sft_{split}_v2.jsonl", sft), (f"grpo_{split}_v2.jsonl", prompts)):
             (output / name).write_text("\n".join(json.dumps(item, ensure_ascii=False) for item in values) + "\n", encoding="utf-8")
             files[name] = len(values)
@@ -81,10 +105,30 @@ def main() -> None:
         "formal": sum(sft["teacher_success"] for sft, _, _ in formal_records) / len(formal_records),
         "qvhighlights": sum(sft["teacher_success"] for sft, _, _ in qv_records) / len(qv_records),
     }
-    report = {"passed": not leakage and not missing_images, "counts": files, "sources": {"formal_tasks": len(formal_records), "qvhighlights_tasks": len(qv_records)}, "teacher_success_rate": teacher_success, "sft_filter": "successful audited teacher trajectories only", "formal_sft_train_repeat": 5, "formal_grpo_train_repeat": 45, "effective_grpo_train_mix": {"qvhighlights": 7218, "formal": 1800, "formal_ratio": round(1800 / 9018, 6)}, "prompt_label_leakage": leakage, "missing_images": missing_images, "notes": "SFT contains successful teacher observations by design. GRPO keeps all label-free prompts so policy learning explores successes and failures. Train prompts repeat the 40 formal tasks to realize the configured 80/20 benchmark-to-raw-image mixture."}
-    report_path = ROOT / "outputs/reports/training_data_audit_v2.json"
-    report_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    generated = {
+        path.name: [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+        for path in output.glob("*_v2.jsonl")
+    }
+    duplicate_policy = {name: duplication_summary(values) for name, values in sorted(generated.items())}
+    expected_repeats = {
+        "sft_train_v2.jsonl": {"formal_multimodal": 5, "qvhighlights": 1},
+        "grpo_train_v2.jsonl": {"formal_multimodal": 45, "qvhighlights": 1},
+    }
+    for name, policy in expected_repeats.items():
+        by_source = {}
+        for source in policy:
+            counts = Counter(item["task_id"] for item in generated[name] if item["source"] == source)
+            by_source[source] = sorted(set(counts.values()))
+        duplicate_policy[name]["repeat_counts_by_source"] = by_source
+        if any(by_source[source] != [repeat] for source, repeat in policy.items()):
+            raise ValueError(f"unexpected repeat policy in {name}: {by_source}")
+    report = {"passed": not leakage and not missing_images, "counts": files, "sources": {"formal_tasks": len(formal_records), "qvhighlights_tasks": len(qv_records)}, "task_split_counts": task_split_counts, "teacher_success_rate": teacher_success, "sft_filter": "successful audited teacher trajectories only", "sft_target": "assistant tool calls only; submit scorer response removed", "formal_sft_train_repeat": 5, "formal_grpo_train_repeat": 45, "duplicate_policy": duplicate_policy, "effective_grpo_train_mix": {"qvhighlights": 7218, "formal": 1800, "formal_ratio": round(1800 / 9018, 6)}, "prompt_label_leakage": leakage, "missing_images": missing_images, "notes": "SFT contains successful teacher observations by design. GRPO keeps all label-free prompts so policy learning explores successes and failures. Train prompts repeat the 40 formal tasks to realize the configured 80/20 benchmark-to-raw-image mixture."}
+    report_text = json.dumps(report, indent=2) + "\n"
+    report_path = output / "training_data_audit_v2.json"
+    report_path.write_text(report_text, encoding="utf-8")
+    runtime_report = ROOT / "outputs/reports/training_data_audit_v2.json"
+    runtime_report.parent.mkdir(parents=True, exist_ok=True)
+    runtime_report.write_text(report_text, encoding="utf-8")
     print(json.dumps(report, indent=2))
     if not report["passed"]:
         raise SystemExit(1)

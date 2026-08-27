@@ -78,6 +78,7 @@ def main() -> None:
             "run_pipeline smoke",
             "run_pipeline full",
             'bash server/run_all.sh',
+            "data/training",
         ],
         errors,
     )
@@ -91,6 +92,7 @@ def main() -> None:
         "server/train_llm_grpo.py",
         "server/evaluate_checkpoint.py",
         "server/analyze_training_run.py",
+        "data/training/training_data_audit_v2.json",
         "src/videoops_rl/tool_gateway.py",
     ):
         if not (ROOT / path).is_file():

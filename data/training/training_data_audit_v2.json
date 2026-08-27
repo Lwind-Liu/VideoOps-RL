@@ -1,0 +1,90 @@
+{
+  "passed": true,
+  "counts": {
+    "sft_train_v2.jsonl": 3575,
+    "grpo_train_v2.jsonl": 9018,
+    "sft_val_v2.jsonl": 776,
+    "grpo_val_v2.jsonl": 1565,
+    "sft_test_v2.jsonl": 782,
+    "grpo_test_v2.jsonl": 1553
+  },
+  "sources": {
+    "formal_tasks": 66,
+    "qvhighlights_tasks": 10310
+  },
+  "task_split_counts": {
+    "train": 7258,
+    "val": 1565,
+    "test": 1553
+  },
+  "teacher_success_rate": {
+    "formal": 0.36363636363636365,
+    "qvhighlights": 0.4908826382153249
+  },
+  "sft_filter": "successful audited teacher trajectories only",
+  "sft_target": "assistant tool calls only; submit scorer response removed",
+  "formal_sft_train_repeat": 5,
+  "formal_grpo_train_repeat": 45,
+  "duplicate_policy": {
+    "grpo_test_v2.jsonl": {
+      "rows": 1553,
+      "unique_tasks": 1553,
+      "duplicate_rows": 0,
+      "max_repeat": 1
+    },
+    "grpo_train_v2.jsonl": {
+      "rows": 9018,
+      "unique_tasks": 7258,
+      "duplicate_rows": 1760,
+      "max_repeat": 45,
+      "repeat_counts_by_source": {
+        "formal_multimodal": [
+          45
+        ],
+        "qvhighlights": [
+          1
+        ]
+      }
+    },
+    "grpo_val_v2.jsonl": {
+      "rows": 1565,
+      "unique_tasks": 1565,
+      "duplicate_rows": 0,
+      "max_repeat": 1
+    },
+    "sft_test_v2.jsonl": {
+      "rows": 782,
+      "unique_tasks": 782,
+      "duplicate_rows": 0,
+      "max_repeat": 1
+    },
+    "sft_train_v2.jsonl": {
+      "rows": 3575,
+      "unique_tasks": 3527,
+      "duplicate_rows": 48,
+      "max_repeat": 5,
+      "repeat_counts_by_source": {
+        "formal_multimodal": [
+          5
+        ],
+        "qvhighlights": [
+          1
+        ]
+      }
+    },
+    "sft_val_v2.jsonl": {
+      "rows": 776,
+      "unique_tasks": 776,
+      "duplicate_rows": 0,
+      "max_repeat": 1
+    }
+  },
+  "effective_grpo_train_mix": {
+    "qvhighlights": 7218,
+    "formal": 1800,
+    "formal_ratio": 0.199601
+  },
+  "prompt_label_leakage": [],
+  "missing_images": [],
+  "notes": "SFT contains successful teacher observations by design. GRPO keeps all label-free prompts so policy learning explores successes and failures. Train prompts repeat the 40 formal tasks to realize the configured 80/20 benchmark-to-raw-image mixture."
+}
