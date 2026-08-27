@@ -17,6 +17,12 @@ os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 from videoops_rl.dataset_protocol import read_jsonl
 from videoops_rl.multivideo_env import MultiVideoHighlightEnv
 from videoops_rl.qv_env import QVHighlightsEnv
+from videoops_rl.tool_gateway import ToolGateway
+
+try:
+    from server.metric_logging import build_metric_callback
+except ModuleNotFoundError:
+    from metric_logging import build_metric_callback
 
 
 class VideoOpsGRPOEnvironment:
@@ -31,6 +37,7 @@ class VideoOpsGRPOEnvironment:
         self.formal_ratio = float(config["training"]["formal_sampling_ratio"])
         self.max_tool_steps = int(config["training"]["max_tool_steps"])
         self.env: MultiVideoHighlightEnv | QVHighlightsEnv | None = None
+        self.gateway: ToolGateway | None = None
         self.final_reward = -1.0
 
     def reset(self, task_id: str | None = None, **_: object) -> str | None:
@@ -47,8 +54,16 @@ class VideoOpsGRPOEnvironment:
             self.env = QVHighlightsEnv(ROOT, task, self.max_tool_steps)
         else:
             self.env = MultiVideoHighlightEnv(ROOT, task, self.max_tool_steps)
+        trace_dir = Path(os.environ.get("VIDEOOPS_TRACE_DIR", ROOT / "outputs/traces/grpo"))
+        fault_rate = float(os.environ.get("VIDEOOPS_TOOL_FAULT_RATE", "0"))
+        self.gateway = ToolGateway(self.env, trace_dir=trace_dir, fault_rate=fault_rate)
         self.final_reward = -1.0
         return None if task_id is not None else json.dumps(self.env.public_prompt, ensure_ascii=False)
+
+    def _invoke(self, tool: str, arguments: dict) -> dict:
+        if self.gateway is None:
+            raise RuntimeError("reset must be called before invoking a tool")
+        return self.gateway.invoke(tool, arguments)
 
     def search_transcript(self, query: str, top_k: int = 3) -> str:
         """Search subtitle evidence.
@@ -57,7 +72,7 @@ class VideoOpsGRPOEnvironment:
             query: Natural-language search query.
             top_k: Maximum number of candidate shots.
         """
-        return json.dumps(self.env.search_transcript(query, top_k), ensure_ascii=False)
+        return json.dumps(self._invoke("search_transcript", {"query": query, "top_k": top_k}), ensure_ascii=False)
 
     def search_visual(self, query: str, top_k: int = 3) -> str:
         """Search visual evidence and decode temporal candidates.
@@ -66,7 +81,7 @@ class VideoOpsGRPOEnvironment:
             query: Natural-language visual description.
             top_k: Maximum number of candidate shots.
         """
-        return json.dumps(self.env.search_visual(query, top_k), ensure_ascii=False)
+        return json.dumps(self._invoke("search_visual", {"query": query, "top_k": top_k}), ensure_ascii=False)
 
     def inspect_keyframe(self, shot_id: str) -> list[dict]:
         """Inspect one candidate keyframe.
@@ -75,9 +90,9 @@ class VideoOpsGRPOEnvironment:
             shot_id: Candidate shot identifier returned by search.
         """
         from PIL import Image
-        observation = self.env.inspect_keyframe(shot_id)
-        path = observation.get("keyframe_path")
-        content = [{"type": "text", "text": json.dumps(observation, ensure_ascii=False)}]
+        response = self._invoke("inspect_keyframe", {"shot_id": shot_id})
+        path = response["observation"].get("keyframe_path")
+        content = [{"type": "text", "text": json.dumps(response, ensure_ascii=False)}]
         if path:
             content.insert(0, {"type": "image", "image": Image.open(ROOT / path).convert("RGB")})
         return content
@@ -89,7 +104,7 @@ class VideoOpsGRPOEnvironment:
             shot_id: Center shot identifier.
             radius: Zero accepts an adaptive proposal; positive values request fixed neighbors.
         """
-        return json.dumps(self.env.expand_context(shot_id, radius), ensure_ascii=False)
+        return json.dumps(self._invoke("expand_context", {"shot_id": shot_id, "radius": radius}), ensure_ascii=False)
 
     def request_audit(self, shot_ids: list[str]) -> str:
         """Ask the evidence auditor to validate a selection.
@@ -97,7 +112,7 @@ class VideoOpsGRPOEnvironment:
         Args:
             shot_ids: Proposed grounded shot identifiers.
         """
-        return json.dumps(self.env.request_audit(shot_ids), ensure_ascii=False)
+        return json.dumps(self._invoke("request_audit", {"shot_ids": shot_ids}), ensure_ascii=False)
 
     def submit(self, shot_ids: list[str]) -> str:
         """Finish the episode and submit selected shots.
@@ -105,9 +120,10 @@ class VideoOpsGRPOEnvironment:
         Args:
             shot_ids: Final grounded shot identifiers.
         """
-        result = self.env.submit(shot_ids)
+        response = self._invoke("submit", {"shot_ids": shot_ids})
+        result = response["observation"]
         self.final_reward = float(result["reward"])
-        return json.dumps({key: value for key, value in result.items() if key not in {"reward_parts"}}, ensure_ascii=False)
+        return json.dumps(response, ensure_ascii=False)
 
     def get_reward(self) -> float:
         return self.final_reward if self.env and self.env.state.done else -1.0
@@ -120,6 +136,7 @@ def main() -> None:
     parser.add_argument("--output-dir", default=str(ROOT / "artifacts/grpo_qwen3vl2b"))
     parser.add_argument("--max-steps", type=int, default=200)
     parser.add_argument("--gradient-accumulation-steps", type=int, default=4)
+    parser.add_argument("--num-generations", type=int, default=4)
     args = parser.parse_args()
     from datasets import load_dataset
     from transformers import AutoProcessor
@@ -129,15 +146,24 @@ def main() -> None:
     config = GRPOConfig(
         output_dir=args.output_dir, max_steps=args.max_steps, learning_rate=1e-6,
         per_device_train_batch_size=1, gradient_accumulation_steps=args.gradient_accumulation_steps,
-        num_generations=4, bf16=True, gradient_checkpointing=True,
+        num_generations=args.num_generations, bf16=True, gradient_checkpointing=True,
         logging_steps=1, save_steps=50, report_to="none",
         use_vllm=True, vllm_mode="server", vllm_server_host="127.0.0.1", vllm_server_port=8000,
     )
     dataset = load_dataset("json", data_files=str(ROOT / "data/training/grpo_train_v2.jsonl"), split="train")
     processor = AutoProcessor.from_pretrained(model_path, local_files_only=True)
-    trainer = GRPOTrainer(model=model_path, args=config, train_dataset=dataset, processing_class=processor, environment_factory=VideoOpsGRPOEnvironment)
+    metric_root = ROOT / "outputs"
+    trainer = GRPOTrainer(
+        model=model_path,
+        args=config,
+        train_dataset=dataset,
+        processing_class=processor,
+        environment_factory=VideoOpsGRPOEnvironment,
+        callbacks=[build_metric_callback("grpo", metric_root)],
+    )
     trainer.train()
     trainer.save_model(args.output_dir)
+    trainer.save_state()
     processor.save_pretrained(args.output_dir)
 
 

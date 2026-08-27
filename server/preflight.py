@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import argparse
 import importlib.metadata
+import os
 import platform
 import shutil
 import inspect
@@ -18,6 +19,7 @@ MODEL_BYTES = 4_255_140_312
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--required-gpus", type=int, default=8)
+    parser.add_argument("--min-free-gib", type=int, default=int(os.environ.get("VIDEOOPS_MIN_FREE_GIB", "60")))
     args = parser.parse_args()
     qv_features = ROOT / "data/external/qvhighlights/features/clip_features"
     model_weight = ROOT / "models/Qwen3-VL-2B-Instruct/model.safetensors"
@@ -50,7 +52,7 @@ def main() -> None:
     except Exception as error:
         checks["torch_error"] = repr(error)
     try:
-        from trl import GRPOTrainer
+        from trl import GRPOConfig, GRPOTrainer
         checks["trl"] = importlib.metadata.version("trl")
         checks["transformers"] = importlib.metadata.version("transformers")
         checks["vllm"] = importlib.metadata.version("vllm")
@@ -62,6 +64,11 @@ def main() -> None:
             and checks["deepspeed"] == "0.19.5"
         )
         checks["trl_environment_factory"] = "environment_factory" in inspect.signature(GRPOTrainer.__init__).parameters
+        grpo_config_fields = inspect.signature(GRPOConfig.__init__).parameters
+        checks["trl_vllm_server_config"] = all(
+            name in grpo_config_fields
+            for name in ("use_vllm", "vllm_mode", "vllm_server_host", "vllm_server_port")
+        )
     except Exception as error:
         checks["trl_error"] = repr(error)
     try:
@@ -83,6 +90,13 @@ def main() -> None:
         checks["tool_chat_template"] = bool(rendered)
     except Exception as error:
         checks["tool_chat_template_error"] = repr(error)
+    try:
+        sys.path.insert(0, str(ROOT / "src"))
+        from videoops_rl.tool_gateway import TOOL_SERVICE_SPECS
+        checks["tool_gateway"] = len(TOOL_SERVICE_SPECS) == 6
+        checks["training_signal_analyzer"] = (ROOT / "server/analyze_training_run.py").is_file()
+    except Exception as error:
+        checks["tool_gateway_error"] = repr(error)
     checks["required_gpus"] = args.required_gpus
     checks["passed"] = (
         checks["python_supported"]
@@ -98,9 +112,12 @@ def main() -> None:
         and checks.get("gpu_count", 0) >= args.required_gpus
         and checks.get("versions_supported", False)
         and checks.get("trl_environment_factory", False)
+        and checks.get("trl_vllm_server_config", False)
         and "jmespath" in checks
         and checks.get("tool_chat_template", False)
-        and checks["free_gib"] >= 20
+        and checks.get("tool_gateway", False)
+        and checks.get("training_signal_analyzer", False)
+        and checks["free_gib"] >= args.min_free_gib
     )
     print(json.dumps(checks, indent=2))
     if not checks["passed"]:

@@ -10,18 +10,24 @@ WORK_DIR=${VIDEOOPS_WORK_DIR:-$PWD/.videoops-bootstrap}
 PACKAGE_NAME=VideoOps-RL-offline-server.zip
 PACKAGE_SHA256=cdd99e1467be9f0de4f311afd6dafe522c3a0b16cc8485b741ab622d1ecd4fe1
 BASE_URL=${VIDEOOPS_BASE_URL:-"https://github.com/${REPOSITORY}/releases/download/${RELEASE_TAG}"}
+ASSET_DIR=${VIDEOOPS_ASSET_DIR:-$PWD/offline_assets}
+MIN_FREE_GIB=${VIDEOOPS_MIN_FREE_GIB:-60}
+export VIDEOOPS_MIN_FREE_GIB="$MIN_FREE_GIB"
 
 mkdir -p "$WORK_DIR"
 exec > >(tee -a "$WORK_DIR/bootstrap.log") 2>&1
 
-for REQUIRED_COMMAND in python curl sha256sum; do
+for REQUIRED_COMMAND in python curl sha256sum awk tee tar; do
   command -v "$REQUIRED_COMMAND" >/dev/null || {
     echo "Missing required command: $REQUIRED_COMMAND" >&2
     exit 2
   }
 done
 
+python server/audit_one_click_contract.py
+
 python - <<'PY'
+import os
 import shutil
 import sys
 
@@ -35,8 +41,9 @@ gpu_count = torch.cuda.device_count()
 if not torch.cuda.is_available() or gpu_count < 8:
     raise SystemExit(f"At least 8 CUDA GPUs are required; detected {gpu_count}.")
 free_gib = shutil.disk_usage(".").free / 1024**3
-if free_gib < 20:
-    raise SystemExit(f"At least 20 GiB free disk is required; found {free_gib:.2f} GiB.")
+min_free_gib = int(os.environ["VIDEOOPS_MIN_FREE_GIB"])
+if free_gib < min_free_gib:
+    raise SystemExit(f"At least {min_free_gib} GiB free disk is required; found {free_gib:.2f} GiB.")
 print(f"Host gate passed: Python {sys.version.split()[0]}, {gpu_count} GPUs, {free_gib:.2f} GiB free.")
 PY
 
@@ -52,6 +59,12 @@ for PART in 00 01 02; do
 
   if [ ! -f "$WORK_DIR/downloads/$FILE" ] || \
      ! echo "$EXPECTED_SHA  $WORK_DIR/downloads/$FILE" | sha256sum --check --status; then
+    if [ -f "$ASSET_DIR/$FILE" ] && \
+       echo "$EXPECTED_SHA  $ASSET_DIR/$FILE" | sha256sum --check --status; then
+      echo "Using uploaded offline asset $ASSET_DIR/$FILE"
+      cp "$ASSET_DIR/$FILE" "$WORK_DIR/downloads/$FILE"
+      continue
+    fi
     echo "Downloading $FILE ..."
     if ! curl --fail --location --retry 8 --retry-all-errors \
       --continue-at - --output "$WORK_DIR/downloads/$FILE" "$BASE_URL/$FILE"; then

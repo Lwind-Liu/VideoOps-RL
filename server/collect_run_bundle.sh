@@ -16,7 +16,7 @@ BUNDLE_NAME="VideoOps-RL-run-report-${STAMP}"
 STAGING="$HANDOFF_ROOT/$BUNDLE_NAME"
 ARCHIVE="$HANDOFF_ROOT/${BUNDLE_NAME}.tar.gz"
 
-mkdir -p "$STAGING/logs" "$STAGING/reports"
+mkdir -p "$STAGING/logs" "$STAGING/reports" "$STAGING/metrics"
 
 {
   echo "utc_time=$STAMP"
@@ -43,7 +43,7 @@ if [ -f "$SOURCE_ROOT/.videoops-bootstrap/bootstrap.log" ]; then
   cp "$SOURCE_ROOT/.videoops-bootstrap/bootstrap.log" "$STAGING/logs/"
 fi
 
-for LOG in outputs/run_all.log outputs/vllm.log outputs/eval_*_shard_*.log; do
+for LOG in outputs/run_all.log outputs/run_all_*.log outputs/vllm.log outputs/vllm_*.log outputs/eval_*.log; do
   if [ -f "$LOG" ]; then
     cp "$LOG" "$STAGING/logs/"
   fi
@@ -52,6 +52,14 @@ done
 if [ -d outputs/reports ]; then
   find outputs/reports -maxdepth 1 -type f \( -name '*.json' -o -name '*.csv' -o -name '*.txt' \) \
     -exec cp {} "$STAGING/reports/" \;
+fi
+
+if [ -d outputs/metrics ]; then
+  find outputs/metrics -maxdepth 1 -type f -name '*.jsonl' -exec cp {} "$STAGING/metrics/" \;
+fi
+
+if [ -d outputs/traces ]; then
+  tar -czf "$STAGING/tool_traces.tar.gz" -C outputs traces
 fi
 
 {

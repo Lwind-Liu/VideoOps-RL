@@ -6,6 +6,9 @@ SFT_EPOCHS=${SFT_EPOCHS:-3.0}
 GRPO_STEPS=${GRPO_STEPS:-200}
 EVAL_TASKS=${EVAL_TASKS:-300}
 RUN_MODE=${RUN_MODE:-full}
+RUN_ID=${VIDEOOPS_RUN_ID:-${RUN_MODE}_$(date -u +%Y%m%dT%H%M%SZ)}
+export VIDEOOPS_RUN_ID="$RUN_ID"
+export VIDEOOPS_TRACE_DIR="$PWD/outputs/traces/$RUN_ID"
 ARTIFACT_ROOT=${ARTIFACT_ROOT:-artifacts}
 SFT_DIR="$ARTIFACT_ROOT/sft_qwen3vl2b"
 MERGED_DIR="$ARTIFACT_ROOT/sft_qwen3vl2b_merged"
@@ -41,7 +44,7 @@ curl --fail --silent http://127.0.0.1:8000/v1/models >/dev/null || { tail -n 100
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19 \
   accelerate launch --config_file configs/accelerate_zero2_20gpu.yaml \
   server/train_llm_grpo.py --sft-checkpoint "$MERGED_DIR" --output-dir "$GRPO_DIR" \
-  --gradient-accumulation-steps 1 --max-steps "$GRPO_STEPS"
+  --gradient-accumulation-steps 1 --num-generations 4 --max-steps "$GRPO_STEPS"
 
 kill "$VLLM_PID" 2>/dev/null || true
 trap - EXIT
@@ -76,3 +79,4 @@ fi
 
 python server/merge_eval_shards.py --dataset all --split val --num-shards 12
 python server/merge_eval_shards.py --dataset all --split test --num-shards 12
+python server/analyze_training_run.py --run-mode "$RUN_MODE" --run-id "$RUN_ID" --group-size 4 --require-traces

@@ -10,11 +10,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def aggregate(rows: list[dict]) -> dict:
+    count = max(1, len(rows))
     return {
         "tasks": len(rows),
-        "mean_iou": sum(row["iou"] for row in rows) / max(1, len(rows)),
-        "success_rate": sum(row["success"] for row in rows) / max(1, len(rows)),
-        "mean_reward": sum(row["reward"] for row in rows) / max(1, len(rows)),
+        "mean_iou": sum(row["iou"] for row in rows) / count,
+        "success_rate": sum(row["success"] for row in rows) / count,
+        "mean_reward": sum(row["reward"] for row in rows) / count,
+        "mean_tool_calls": sum(row["tool_calls"] for row in rows) / count,
+        "invalid_call_rate": sum(row.get("invalid_calls", 0) for row in rows) / max(1, sum(row["tool_calls"] for row in rows)),
+        "repeated_call_rate": sum(row.get("repeated_calls", 0) for row in rows) / max(1, sum(row["tool_calls"] for row in rows)),
+        "audit_pass_rate": sum(row.get("audit_passed", False) for row in rows) / count,
     }
 
 

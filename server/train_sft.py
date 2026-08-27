@@ -9,9 +9,11 @@ import os
 from pathlib import Path
 
 try:
-    from server.tool_schemas import TOOL_SCHEMAS
+    from server.tool_schemas import TOOL_SCHEMAS, wrap_offline_observation
+    from server.metric_logging import build_metric_callback
 except ModuleNotFoundError:  # Direct execution: python server/train_sft.py
-    from tool_schemas import TOOL_SCHEMAS
+    from tool_schemas import TOOL_SCHEMAS, wrap_offline_observation
+    from metric_logging import build_metric_callback
 
 ROOT = Path(__file__).resolve().parents[1]
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
@@ -28,11 +30,30 @@ def _text_content(content: object) -> str | None:
     return None
 
 
+def _replace_text_content(content: object, text: str) -> object:
+    if isinstance(content, str):
+        return text
+    if isinstance(content, list):
+        replaced = False
+        blocks = []
+        for block in content:
+            current = copy.deepcopy(block)
+            if isinstance(current, dict) and current.get("type") == "text" and not replaced:
+                current["text"] = text
+                replaced = True
+            blocks.append(current)
+        if not replaced:
+            blocks.append({"type": "text", "text": text})
+        return blocks
+    return text
+
+
 def normalize_tool_record(record: dict) -> dict:
     """Convert legacy JSON action text into TRL's native tool-calling format."""
     normalized = copy.deepcopy(record)
     messages = []
     pending_tool: str | None = None
+    pending_arguments: dict = {}
     native_calls = 0
     for message in normalized["messages"]:
         current = copy.deepcopy(message)
@@ -44,6 +65,7 @@ def normalize_tool_record(record: dict) -> dict:
                 call = None
             if isinstance(call, dict) and isinstance(call.get("tool"), str) and isinstance(call.get("arguments"), dict):
                 pending_tool = call["tool"]
+                pending_arguments = call["arguments"]
                 current = {
                     "role": "assistant",
                     "tool_calls": [{
@@ -56,7 +78,24 @@ def normalize_tool_record(record: dict) -> dict:
             if pending_tool is None:
                 raise ValueError(f"tool response without assistant call in {record.get('task_id')}")
             current["name"] = pending_tool
+            text = _text_content(current.get("content"))
+            try:
+                observation = json.loads(text) if text else None
+            except json.JSONDecodeError:
+                observation = None
+            if isinstance(observation, dict) and "observation" not in observation:
+                wrapped = wrap_offline_observation(
+                    pending_tool,
+                    pending_arguments,
+                    observation,
+                    str(record.get("task_id", "unknown")),
+                    native_calls,
+                )
+                current["content"] = _replace_text_content(
+                    current.get("content"), json.dumps(wrapped, ensure_ascii=False)
+                )
             pending_tool = None
+            pending_arguments = {}
         messages.append(current)
     if native_calls == 0:
         raise ValueError(f"no tool calls found in {record.get('task_id')}")
@@ -94,9 +133,18 @@ def main() -> None:
     )
     peft = LoraConfig(r=16, lora_alpha=32, lora_dropout=0.05, target_modules="all-linear", task_type="CAUSAL_LM")
     processor = AutoProcessor.from_pretrained(args.model, local_files_only=True)
-    trainer = SFTTrainer(model=args.model, args=config, train_dataset=dataset["train"], eval_dataset=dataset["validation"], peft_config=peft, processing_class=processor)
+    trainer = SFTTrainer(
+        model=args.model,
+        args=config,
+        train_dataset=dataset["train"],
+        eval_dataset=dataset["validation"],
+        peft_config=peft,
+        processing_class=processor,
+        callbacks=[build_metric_callback("sft", ROOT / "outputs")],
+    )
     trainer.train()
     trainer.save_model(args.output_dir)
+    trainer.save_state()
     processor.save_pretrained(args.output_dir)
 
 

@@ -18,6 +18,7 @@ os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 from videoops_rl.dataset_protocol import read_jsonl
 from videoops_rl.multivideo_env import MultiVideoHighlightEnv
 from videoops_rl.qv_env import QVHighlightsEnv
+from videoops_rl.tool_gateway import ToolGateway
 
 SYSTEM = "Use one tool at a time. Answer only JSON: {\"tool\": NAME, \"arguments\": OBJECT}. Finish with submit."
 
@@ -34,16 +35,8 @@ def parse_call(text: str) -> dict | None:
     return None
 
 
-def dispatch(env: MultiVideoHighlightEnv | QVHighlightsEnv, call: dict) -> dict:
-    allowed = {name: getattr(env, name) for name in ("search_transcript", "search_visual", "inspect_keyframe", "expand_context", "request_audit", "submit")}
-    if call["tool"] not in allowed:
-        env.state.invalid_calls += 1
-        return {"error": "unknown_tool"}
-    try:
-        return allowed[call["tool"]](**call["arguments"])
-    except (TypeError, ValueError) as error:
-        env.state.invalid_calls += 1
-        return {"error": "invalid_arguments", "detail": str(error)}
+def dispatch(gateway: ToolGateway, call: dict) -> dict:
+    return gateway.invoke(call["tool"], call["arguments"])
 
 
 def main() -> None:
@@ -74,6 +67,7 @@ def main() -> None:
     for task in tasks:
         source = "qvhighlights" if task["video_id"].startswith("qvh:") else "formal"
         env = QVHighlightsEnv(ROOT, task) if source == "qvhighlights" else MultiVideoHighlightEnv(ROOT, task)
+        gateway = ToolGateway(env, trace_dir=ROOT / "outputs/traces/eval")
         messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": json.dumps(env.public_prompt)}]
         parse_errors = 0
         for _ in range(env.max_steps):
@@ -89,17 +83,34 @@ def main() -> None:
                 parse_errors += 1
                 messages.extend([{"role": "assistant", "content": text}, {"role": "tool", "content": "Invalid JSON. Try one valid tool call."}])
                 continue
-            observation = dispatch(env, call)
-            tool_content: str | list[dict] = json.dumps(observation)
+            response = dispatch(gateway, call)
+            observation = response["observation"]
+            tool_content: str | list[dict] = json.dumps(response)
             if observation.get("keyframe_path"):
-                tool_content = [{"type": "image", "image": str(ROOT / observation["keyframe_path"])}, {"type": "text", "text": json.dumps(observation)}]
+                tool_content = [{"type": "image", "image": str(ROOT / observation["keyframe_path"])}, {"type": "text", "text": json.dumps(response)}]
             messages.extend([{"role": "assistant", "content": json.dumps(call)}, {"role": "tool", "content": tool_content}])
             if env.state.done:
                 break
         result = next((step["observation"] for step in reversed(env.trajectory) if step["tool"] == "submit"), {"temporal_iou": 0.0, "success": False, "reward": -1.0})
-        rows.append({"task_id": task["task_id"], "source": source, "iou": result["temporal_iou"], "success": result["success"], "reward": result["reward"], "parse_errors": parse_errors, "tool_calls": env.state.tool_calls})
+        rows.append({
+            "task_id": task["task_id"], "source": source, "iou": result["temporal_iou"],
+            "success": result["success"], "reward": result["reward"],
+            "reward_parts": result.get("reward_parts", {}), "parse_errors": parse_errors,
+            "tool_calls": env.state.tool_calls, "invalid_calls": env.state.invalid_calls,
+            "repeated_calls": env.state.repeated_calls, "audit_passed": result.get("audit_passed", False),
+            "trajectory_tools": [step["tool"] for step in env.trajectory],
+        })
     def aggregate(items: list[dict]) -> dict:
-        return {"tasks": len(items), "mean_iou": sum(row["iou"] for row in items) / max(1, len(items)), "success_rate": sum(row["success"] for row in items) / max(1, len(items)), "mean_reward": sum(row["reward"] for row in items) / max(1, len(items))}
+        count = max(1, len(items))
+        return {
+            "tasks": len(items), "mean_iou": sum(row["iou"] for row in items) / count,
+            "success_rate": sum(row["success"] for row in items) / count,
+            "mean_reward": sum(row["reward"] for row in items) / count,
+            "mean_tool_calls": sum(row["tool_calls"] for row in items) / count,
+            "invalid_call_rate": sum(row["invalid_calls"] for row in items) / max(1, sum(row["tool_calls"] for row in items)),
+            "repeated_call_rate": sum(row["repeated_calls"] for row in items) / max(1, sum(row["tool_calls"] for row in items)),
+            "audit_pass_rate": sum(row["audit_passed"] for row in items) / count,
+        }
     report = {"model": args.model, "split": args.split, "dataset": args.dataset, "sampling": {"max_tasks": args.max_tasks, "seed": args.seed, "complete_split": args.max_tasks == 0, "num_shards": args.num_shards, "shard_index": args.shard_index}, **aggregate(rows), "by_source": {source: aggregate([row for row in rows if row["source"] == source]) for source in sorted({row["source"] for row in rows})}, "parse_error_rate": sum(row["parse_errors"] for row in rows) / max(1, sum(row["tool_calls"] + row["parse_errors"] for row in rows)), "rows": rows}
     suffix = f"_shard{args.shard_index:02d}-of-{args.num_shards:02d}" if args.num_shards > 1 else ""
     path = ROOT / f"outputs/reports/checkpoint_{args.dataset}_{args.split}_eval{suffix}.json"

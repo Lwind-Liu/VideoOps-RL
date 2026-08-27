@@ -1,6 +1,6 @@
 # VideoOps-RL
 
-面向长视频媒资理解的多模态、多 Agent、Agentic RL 工程。项目已经包含代码、数据、模型权重和训练配置；执行者的任务只是启动整套训练，并在结束后回传结果。
+面向长视频媒资理解的多模态、多 Agent、Agentic RL 工程。`main` 分支保存代码、协议和启动器，GitHub Release 保存数据、模型权重等大文件；两者由启动脚本自动组装为完整训练环境。
 
 > 执行者不要手动逐个运行 SFT、vLLM、GRPO 或评测脚本。只运行下面的一条启动命令，脚本会自动先做 Smoke，Smoke 成功后继续 Full；任何阶段失败都会停止。
 
@@ -25,7 +25,7 @@ cd VideoOps-RL && bash bootstrap_server.sh
 
 启动后无需再输入其他训练命令。脚本会自动下载并校验离线资产、安装依赖、选择 8 卡或24 卡路径、完成 Smoke 和 Full，并保存 checkpoint、日志和评测报告。
 
-机器需要满足：Linux、Python 3.11/3.12、可用的 CUDA PyTorch、至少 8 张可见 GPU、至少20 GiB 可用磁盘，并且能够访问 GitHub Release 和 Python 包索引。条件不满足时脚本会在大文件下载前直接报错。
+机器需要满足：Linux、Python 3.11/3.12、可用的 CUDA PyTorch、至少 8 张可见 GPU、至少 60 GiB 可用磁盘，并且能够访问 GitHub Release 和 Python 包索引。启动器会先审计仓库契约和主机条件，未通过时不会下载大文件。
 
 ### 第二步：结束后打包回传
 
@@ -88,7 +88,16 @@ VideoOps-RL 运行结果
 
 详细技术文档：
 
+- [业务等价工具、Agentic RL 必要性与训练信号](docs/AGENTIC_RL_REPRODUCTION.md)
 - [服务器执行与资产说明](docs/SERVER_PACKAGE.md)
 - [Algorithm v2 详解](docs/ALGORITHM_V2_GUIDE.md)
 - [完整全链路教程](docs/FULL_PIPELINE_TUTORIAL.md)
 - [离线训练包 Release](https://github.com/Lwind-Liu/VideoOps-RL/releases/tag/offline-v2.0.0)
+
+服务器没有权重、希望先从本地上传时，先在 Windows 运行：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/prepare_offline_assets.ps1
+```
+
+上传仓库和生成的 `offline_assets/` 后，Bootstrap 会优先使用本地分片。训练会额外保存 SFT/GRPO 指标、逐工具调用 trace 和训练信号门禁报告。

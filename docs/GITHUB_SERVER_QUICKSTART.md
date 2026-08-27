@@ -18,9 +18,15 @@ bash bootstrap_server.sh
 
 该命令会自动先运行 Smoke，成功后继续 Full，不需要执行者手动拆分阶段。
 
-启动脚本首先检查 Python 3.11/3.12、CUDA PyTorch、至少 8 张可见 GPU、20 GiB 可用磁盘，以及 `curl`/`sha256sum`。门禁不通过时不会开始下载大文件。依赖版本已锁定，其中 TRL 1.9.2 对应 vLLM 0.25.1；DeepSpeed 在确认镜像已有 CUDA PyTorch 后以非隔离方式安装。
+启动脚本首先审计仓库的一键执行契约，再检查 Python 3.11/3.12、CUDA PyTorch、至少 8 张可见 GPU、60 GiB 可用磁盘，以及 `curl`、`sha256sum`、`awk`、`tee`、`tar`。门禁不通过时不会开始下载大文件。依赖版本已锁定，其中 TRL 1.9.2 对应 vLLM 0.25.1；DeepSpeed 在确认镜像已有 CUDA PyTorch 后以非隔离方式安装。
 
 执行顺序固定为：主机门禁 → 三分片断点下载 → 分片与整包 SHA-256 → 解压 → 用 Git 最新代码覆盖运行快照 → 安装依赖 → 完整 preflight → LoRA SFT → 合并模型 → 启动 vLLM → Agentic GRPO → 关闭 rollout 服务 → val/test 评测。
+
+只检查当前 Git checkout 是否完整，不下载资产、不需要 GPU：
+
+```bash
+python server/audit_one_click_contract.py
+```
 
 如平台提供启动命令栏，可直接填写后一条命令。下载支持续传，重复执行不会重新下载已经通过 SHA-256 校验的分片。
 

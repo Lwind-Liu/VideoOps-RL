@@ -16,3 +16,10 @@ def test_sft_record_is_converted_to_native_tool_calls():
     assert len(calls) == len(responses)
     assert all(message.get("name") for message in responses)
     assert {tool["function"]["name"] for tool in normalized["tools"]} >= {"search_visual", "submit"}
+    text_blocks = [
+        block["text"]
+        for message in responses
+        for block in message["content"]
+        if block.get("type") == "text"
+    ]
+    assert all("request_id" in json.loads(text) and "observation" in json.loads(text) for text in text_blocks)
