@@ -10,7 +10,8 @@ WORK_DIR=${VIDEOOPS_WORK_DIR:-$PWD/.videoops-bootstrap}
 PACKAGE_NAME=VideoOps-RL-offline-server.zip
 PACKAGE_SHA256=cdd99e1467be9f0de4f311afd6dafe522c3a0b16cc8485b741ab622d1ecd4fe1
 BASE_URL=${VIDEOOPS_BASE_URL:-"https://github.com/${REPOSITORY}/releases/download/${RELEASE_TAG}"}
-ASSET_DIR=${VIDEOOPS_ASSET_DIR:-$PWD/offline_assets}
+ASSET_DIR=${VIDEOOPS_ASSET_DIR:-}
+ASSET_SEARCH_ROOTS=${VIDEOOPS_ASSET_SEARCH_ROOTS:-"/root/code /root/input /input /mnt/data /mnt/oss /root/oss /dataset"}
 MIN_FREE_GIB=${VIDEOOPS_MIN_FREE_GIB:-60}
 export VIDEOOPS_MIN_FREE_GIB="$MIN_FREE_GIB"
 
@@ -49,6 +50,55 @@ PY
 
 mkdir -p "$WORK_DIR/downloads" "$WORK_DIR/runtime"
 
+asset_dir_valid() {
+  local CANDIDATE=$1
+  [ -d "$CANDIDATE" ] || return 1
+  for PART in 00 01 02; do
+    local FILE="${PACKAGE_NAME}.part-${PART}"
+    local EXPECTED_SHA
+    EXPECTED_SHA=$(awk -v file="$FILE" '$2 == file { print $1 }' release_manifest.sha256)
+    [ -n "$EXPECTED_SHA" ] || return 1
+    [ -f "$CANDIDATE/$FILE" ] || return 1
+    echo "$EXPECTED_SHA  $CANDIDATE/$FILE" | sha256sum --check --status || return 1
+  done
+}
+
+find_asset_dir() {
+  local CANDIDATE
+  for CANDIDATE in "$PWD/offline_assets" "$PWD" $ASSET_SEARCH_ROOTS; do
+    if asset_dir_valid "$CANDIDATE"; then
+      printf '%s\n' "$CANDIDATE"
+      return 0
+    fi
+    if [ -d "$CANDIDATE" ]; then
+      local CHILD
+      for CHILD in "$CANDIDATE"/*; do
+        [ -d "$CHILD" ] || continue
+        if asset_dir_valid "$CHILD"; then
+          printf '%s\n' "$CHILD"
+          return 0
+        fi
+      done
+    fi
+  done
+  return 1
+}
+
+RESOLVED_ASSET_DIR=""
+if [ -n "$ASSET_DIR" ]; then
+  if asset_dir_valid "$ASSET_DIR"; then
+    RESOLVED_ASSET_DIR="$ASSET_DIR"
+  else
+    echo "VIDEOOPS_ASSET_DIR is set but does not contain valid release parts: $ASSET_DIR" >&2
+    exit 3
+  fi
+else
+  RESOLVED_ASSET_DIR=$(find_asset_dir || true)
+fi
+if [ -n "$RESOLVED_ASSET_DIR" ]; then
+  echo "Using local offline assets from $RESOLVED_ASSET_DIR"
+fi
+
 for PART in 00 01 02; do
   FILE="${PACKAGE_NAME}.part-${PART}"
   EXPECTED_SHA=$(awk -v file="$FILE" '$2 == file { print $1 }' release_manifest.sha256)
@@ -59,10 +109,9 @@ for PART in 00 01 02; do
 
   if [ ! -f "$WORK_DIR/downloads/$FILE" ] || \
      ! echo "$EXPECTED_SHA  $WORK_DIR/downloads/$FILE" | sha256sum --check --status; then
-    if [ -f "$ASSET_DIR/$FILE" ] && \
-       echo "$EXPECTED_SHA  $ASSET_DIR/$FILE" | sha256sum --check --status; then
-      echo "Using uploaded offline asset $ASSET_DIR/$FILE"
-      cp "$ASSET_DIR/$FILE" "$WORK_DIR/downloads/$FILE"
+    if [ -n "$RESOLVED_ASSET_DIR" ]; then
+      echo "Using uploaded offline asset $RESOLVED_ASSET_DIR/$FILE"
+      cp "$RESOLVED_ASSET_DIR/$FILE" "$WORK_DIR/downloads/$FILE"
       continue
     fi
     echo "Downloading $FILE ..."

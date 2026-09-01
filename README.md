@@ -23,9 +23,21 @@ git clone --branch main https://github.com/Lwind-Liu/VideoOps-RL.git
 cd VideoOps-RL && bash bootstrap_server.sh
 ```
 
-启动后无需再输入其他训练命令。脚本会自动下载并校验离线资产、安装依赖、选择 8 卡或24 卡路径、完成 Smoke 和 Full，并保存 checkpoint、日志和评测报告。
+启动后无需再输入其他训练命令。脚本会自动查找或下载并校验离线资产、安装依赖、选择 8 卡或24 卡路径、完成 Smoke 和 Full，并保存 checkpoint、日志和评测报告。
 
 机器需要满足：Linux、Python 3.11/3.12、可用的 CUDA PyTorch、至少 8 张可见 GPU、至少 60 GiB 可用磁盘，并且能够访问 GitHub Release 和 Python 包索引。启动器会先审计仓库契约和主机条件，未通过时不会下载大文件。
+
+Primus 等平台如果能拉代码但不能下载 GitHub Release 大文件，请把 Release 的三个分片作为数据集或 OSS 目录挂载到容器。脚本会自动扫描 `/root/code/offline_assets`、`/root/input`、`/input`、`/mnt/data`、`/mnt/oss`、`/root/oss` 和 `/dataset` 的本层及一层子目录；找到三片并通过 SHA-256 校验后，会直接使用本地资产，不再访问 GitHub Release。若平台挂载路径特殊，启动命令写成：
+
+```bash
+cd /root/code && VIDEOOPS_ASSET_DIR=/path/to/offline_assets bash bootstrap_server.sh
+```
+
+若三片转存为内部 HTTP/OSS 地址，保证 URL 目录下直接可访问 `VideoOps-RL-offline-server.zip.part-00/01/02`，然后写成：
+
+```bash
+cd /root/code && VIDEOOPS_BASE_URL=https://internal.example/offline-v2.0.0 bash bootstrap_server.sh
+```
 
 ### 第二步：结束后打包回传
 
