@@ -27,7 +27,7 @@ cd VideoOps-RL && bash bootstrap_server.sh
 
 机器需要满足：Linux、Python 3.11/3.12、可用的 CUDA PyTorch、至少 8 张可见 GPU、至少 60 GiB 可用磁盘，并且能够访问 GitHub Release 和 Python 包索引。启动器会先审计仓库契约和主机条件，未通过时不会下载大文件。
 
-Primus 等平台如果能拉代码但不能下载 GitHub Release 大文件，请把 Release 的三个分片作为数据集或 OSS 目录挂载到容器。脚本会自动扫描 `/root/code/offline_assets`、`/root/input`、`/input`、`/mnt/data`、`/mnt/oss`、`/root/oss` 和 `/dataset` 的本层及一层子目录；找到三片并通过 SHA-256 校验后，会直接使用本地资产，不再访问 GitHub Release。若平台挂载路径特殊，启动命令写成：
+Primus 等平台如果能拉代码但不能下载 GitHub Release 大文件，请把 Release 的三个分片作为数据集或 OSS 目录挂载到容器。脚本会自动扫描 `/root/code/offline_assets`、`/root/input`、`/input`、`/primus_datasets`、`/root/primus_datasets`、`/mnt/data`、`/mnt/oss`、`/root/oss` 和 `/dataset` 的本层及一层子目录；找到三片并通过 SHA-256 校验后，会直接使用本地资产，不再访问 GitHub Release。若平台挂载路径特殊，启动命令写成：
 
 ```bash
 cd /root/code && VIDEOOPS_ASSET_DIR=/path/to/offline_assets bash bootstrap_server.sh

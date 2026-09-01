@@ -40,6 +40,7 @@ def test_bootstrap_and_dependency_contract_is_pinned():
     assert 'run_pipeline smoke' in bootstrap
     assert 'run_pipeline full' in bootstrap
     assert 'ASSET_SEARCH_ROOTS=${VIDEOOPS_ASSET_SEARCH_ROOTS:-' in bootstrap
+    assert '/primus_datasets' in bootstrap
     assert 'asset_dir_valid()' in bootstrap
     assert 'Using local offline assets from $RESOLVED_ASSET_DIR' in bootstrap
     assert 'cp -a "$PATH_TO_OVERLAY" "$PROJECT_DIR/"' in bootstrap

@@ -40,7 +40,7 @@ VideoOps-RL-offline-server.zip.part-01
 VideoOps-RL-offline-server.zip.part-02
 ```
 
-挂载目录如果是 `/root/code/offline_assets`、`/root/input`、`/input`、`/mnt/data`、`/mnt/oss`、`/root/oss` 或 `/dataset` 的本层或一层子目录，启动命令不用改：
+挂载目录如果是 `/root/code/offline_assets`、`/root/input`、`/input`、`/primus_datasets`、`/root/primus_datasets`、`/mnt/data`、`/mnt/oss`、`/root/oss` 或 `/dataset` 的本层或一层子目录，启动命令不用改：
 
 ```bash
 cd /root/code

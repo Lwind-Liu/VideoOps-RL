@@ -11,7 +11,7 @@ PACKAGE_NAME=VideoOps-RL-offline-server.zip
 PACKAGE_SHA256=cdd99e1467be9f0de4f311afd6dafe522c3a0b16cc8485b741ab622d1ecd4fe1
 BASE_URL=${VIDEOOPS_BASE_URL:-"https://github.com/${REPOSITORY}/releases/download/${RELEASE_TAG}"}
 ASSET_DIR=${VIDEOOPS_ASSET_DIR:-}
-ASSET_SEARCH_ROOTS=${VIDEOOPS_ASSET_SEARCH_ROOTS:-"/root/code /root/input /input /mnt/data /mnt/oss /root/oss /dataset"}
+ASSET_SEARCH_ROOTS=${VIDEOOPS_ASSET_SEARCH_ROOTS:-"/root/code /root/input /input /primus_datasets /root/primus_datasets /mnt/data /mnt/oss /root/oss /dataset"}
 MIN_FREE_GIB=${VIDEOOPS_MIN_FREE_GIB:-60}
 export VIDEOOPS_MIN_FREE_GIB="$MIN_FREE_GIB"
 
